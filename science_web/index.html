@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="fresh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>科學科 — 探索科學的奧秘</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 風格切換器 -->
+  <div class="theme-switcher">
+    <span class="theme-switcher__label">🎨 風格切換</span>
+    <div class="theme-switcher__options">
+      <button class="theme-btn active" data-theme="fresh" title="清新明亮">☀️ 清新明亮</button>
+      <button class="theme-btn" data-theme="tech" title="科技深藍">🔮 科技深藍</button>
+      <button class="theme-btn" data-theme="nature" title="自然實驗">🌿 自然實驗</button>
+    </div>
+  </div>
+
+  <!-- 頂部導航 -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="header__brand">
+        <span class="header__icon">🔬</span>
+        <h1 class="header__title">科學科</h1>
+      </div>
+      <nav class="header__nav">
+        <a href="#purpose">學習宗旨</a>
+        <a href="#activities">學科活動</a>
+        <a href="#awards">獲獎項目</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 英雄橫幅 -->
+  <section class="hero">
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <h2 class="hero__title">探索科學的奧秘</h2>
+      <p class="hero__subtitle">從實驗中學習，從觀察中成長</p>
+    </div>
+  </section>
+
+  <!-- 學習宗旨 -->
+  <section id="purpose" class="section">
+    <div class="container">
+      <h2 class="section__title">📖 學習宗旨</h2>
+      <p class="section__intro">本校科學科致力於培養學生的科學素養，透過探究式學習，引導學生體驗科學探究的樂趣，並建立終身學習的能力。</p>
+      <div class="cards cards--4">
+        <article class="card">
+          <div class="card__icon">🔍</div>
+          <h3 class="card__title">探究精神</h3>
+          <p class="card__text">鼓勵學生主動探索自然現象，透過提問、假設、驗證的過程，培養科學探究的習慣與熱忱。</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🧠</div>
+          <h3 class="card__title">批判思維</h3>
+          <p class="card__text">訓練學生分析數據、評估證據，發展邏輯推理與獨立思考的能力，面對資訊時能理性判斷。</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🧪</div>
+          <h3 class="card__title">動手實驗</h3>
+          <p class="card__text">提供豐富的實驗機會，讓學生親手操作器材、觀察現象，從「做中學」深化對科學概念的理解。</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🌍</div>
+          <h3 class="card__title">聯繫生活</h3>
+          <p class="card__text">將課堂知識與日常生活結合，引導學生發現身邊的科學原理，體會科學在現代社會中的重要性。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 學科活動 -->
+  <section id="activities" class="section section--alt">
+    <div class="container">
+      <h2 class="section__title">🎓 學科活動</h2>
+      <p class="section__intro">透過多元化的學科活動，豐富學生的科學學習體驗，激發學習興趣，拓展科學視野。</p>
+      <div class="cards cards--2">
+        <article class="card card--horizontal">
+          <div class="card__image"><img src="images/lab-tubes.jpg" alt="實驗工作坊" loading="lazy"></div>
+          <div class="card__body">
+            <h3 class="card__title">🔬 實驗工作坊</h3>
+            <p class="card__text">定期舉辦主題式實驗工作坊，涵蓋化學、物理、生物等範疇。學生可動手配製溶液、觀察顯微標本、設計簡單電路，在安全環境中體驗科學探究的樂趣。</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="card card--horizontal">
+          <div class="card__image"><img src="images/event.jpg" alt="科學週" loading="lazy"></div>
+          <div class="card__body">
+            <h3 class="card__title">🎉 科學週</h3>
+            <p class="card__text">每年舉辦科學週，安排科學演示、問答比賽、模型製作等精彩活動，讓全校師生共同參與，營造濃厚的科學學習氛圍。</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="card card--horizontal">
+          <div class="card__image"><img src="images/scientist-lab.jpg" alt="戶外考察" loading="lazy"></div>
+          <div class="card__body">
+            <h3 class="card__title">🏞️ 戶外考察</h3>
+            <p class="card__text">組織學生到科學館、大學實驗室、自然生態區進行實地考察，將課本知識與真實情境連結，開闊科學視野。</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="card card--horizontal">
+          <div class="card__image"><img src="images/award-new.jpg" alt="STEM 比賽" loading="lazy"></div>
+          <div class="card__body">
+            <h3 class="card__title">🏆 STEM 比賽</h3>
+            <p class="card__text">積極組織學生參加各類 STEM 競賽，包括科學創意發明比賽、機械人競賽、編程比賽等，鍛鍊團隊合作與解難能力。</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 獲獎項目 -->
+  <section id="awards" class="section">
+    <div class="container">
+      <h2 class="section__title">🏆 獲獎項目</h2>
+      <p class="section__intro">本校學生在各類科學比賽中屢獲佳績，以下為部分優異成績（示例）。</p>
+      <div class="awards-grid">
+        <article class="award-card">
+          <div class="award-card__ribbon">🥇 金獎</div>
+          <div class="award-card__image"><img src="images/microscope.jpg" alt="科學創意比賽" loading="lazy"></div>
+          <div class="award-card__body">
+            <h3 class="award-card__title">全港青少年科學創意比賽</h3>
+            <p class="award-card__team">參賽學生：李小明、王大華</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="award-card">
+          <div class="award-card__ribbon">🥈 銀獎</div>
+          <div class="award-card__image"><img src="images/dna.jpg" alt="生物探究比賽" loading="lazy"></div>
+          <div class="award-card__body">
+            <h3 class="award-card__title">中學生生物探究比賽</h3>
+            <p class="award-card__team">參賽學生：陳美玲、張志強</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="award-card">
+          <div class="award-card__ribbon">🥉 銅獎</div>
+          <div class="award-card__image"><img src="images/lab-tubes.jpg" alt="化學實驗比賽" loading="lazy"></div>
+          <div class="award-card__body">
+            <h3 class="award-card__title">校際化學實驗技能比賽</h3>
+            <p class="award-card__team">參賽學生：林小紅、趙偉文</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+        <article class="award-card">
+          <div class="award-card__ribbon">🏆 優異獎</div>
+          <div class="award-card__image"><img src="images/scientist-lab.jpg" alt="STEM 創新大賽" loading="lazy"></div>
+          <div class="award-card__body">
+            <h3 class="award-card__title">青少年 STEM 創新大賽</h3>
+            <p class="award-card__team">參賽學生：劉思琪、黃家明</p>
+            <span class="card__tag">示例內容</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 頁尾 -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <p class="footer__text">© 2025 學校科學科 — 此為示例網頁樣板</p>
+      <p class="footer__note">本網站為靜態 HTML 示範，內容均為虛構資料，供風格參考之用。</p>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
