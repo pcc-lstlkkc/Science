@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科學探究學習中心 | Science Learning Hub</title>
+    <meta name="description" content="科學探究互動學習平台：金屬與磁性實驗室、公平測試與變數辨異互動測驗">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+
+        /* 動畫：卡片淡入上浮 */
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-card { animation: fade-up .6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .2s; }
+
+        @keyframes float-bob {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        .anim-bob { animation: float-bob 3s ease-in-out infinite; }
+
+        /* 暗色模式變數 */
+        :root {
+            --bg-app: #f0f7f4;
+            --text-main: #1e293b;
+        }
+        body.dark {
+            --bg-app: #0f172a;
+            --text-main: #e2e8f0;
+        }
+        body { background-color: var(--bg-app); color: var(--text-main); transition: background-color .4s ease, color .4s ease; }
+
+        /* 卡片群組懸浮效果 */
+        .card-link { transition: transform .3s ease, box-shadow .3s ease; }
+        .card-link:hover { transform: translateY(-6px); box-shadow: 0 20px 30px -12px rgba(0,0,0,.18); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- 頂部導覽 -->
+    <header class="bg-gradient-to-r from-teal-700 via-emerald-700 to-cyan-800 text-white shadow-lg">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-white/10 rounded-2xl backdrop-blur border border-white/20 anim-bob">
+                    <svg class="w-9 h-9 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-black tracking-tight">科學探究學習中心</h1>
+                    <p class="text-sm text-emerald-100 font-medium mt-0.5">中學科學科 ‧ 互動學習與測驗平台</p>
+                </div>
+            </div>
+            <button onclick="toggleDarkMode()" id="dark-toggle" class="p-2.5 rounded-xl bg-white/10 border border-white/20 hover:bg-white/25 transition text-xl" title="切換深色/淺色模式" aria-label="切換深色/淺色模式">🌙</button>
+        </div>
+    </header>
+
+    <!-- 主要內容 -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10">
+
+        <!-- 歡迎橫幅 -->
+        <section class="text-center mb-10 anim-card">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-100 text-teal-800 text-sm font-bold">
+                <span>🧭</span> 科學探究 ─ 從觀察到公平測試
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-black text-slate-800 dark:text-slate-100 mt-4 leading-tight">
+                動手探索，<span class="text-teal-600">公平驗證</span> 每一項發現
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-3 max-w-2xl mx-auto">
+                選擇下方教材活動，開始你的科學探究之旅：觀察現象、提出假設、設計公平測試並驗證變數。
+            </p>
+        </section>
+
+
+        <!-- 教材活動卡片 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- 活動卡片 1：金屬與磁性 -->
+            <a href="1_4_金屬與磁性互動實驗室.html"
+               class="card-link anim-card delay-1 group bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-bold">活動 1.4</span>
+                    <span class="text-3xl group-hover:scale-110 transition-transform">🧲</span>
+                </div>
+                <h3 class="text-xl font-black text-slate-800 dark:text-slate-100">金屬與磁性實驗室</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">科學探究的步驟</p>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mt-3 leading-relaxed flex-1">
+                    化身小小科學家，親手拖動磁石測試不同金屬──釘子、鋁、銅、金、銀。觀察哪些會受吸引，並學習「觀察 → 假設 → 實驗 → 結論」的完整探究步驟。
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold">互動實驗</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold">觀察假設</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold">結論驗證</span>
+                </div>
+                <div class="mt-5 inline-flex items-center gap-1.5 font-bold text-teal-600 group-hover:text-teal-700">
+                    立即開始 <span aria-hidden="true">→</span>
+                </div>
+            </a>
+
+            <!-- 活動卡片 2：公平測試 -->
+            <a href="fairtest_mc_1.html"
+               class="card-link anim-card delay-2 group bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">互動學堂</span>
+                    <span class="text-3xl group-hover:scale-110 transition-transform">🧪</span>
+                </div>
+                <h3 class="text-xl font-black text-slate-800 dark:text-slate-100">公平測試與變數辨異</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">互動測驗與模擬器</p>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mt-3 leading-relaxed flex-1">
+                    透過 20 題互動測驗釐清獨立變數、因變數與對照變數；再走進「公平測試模擬器」，用食鹽溶解實驗即刻驗證是否公平！
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold">20 題測驗</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold">概念圖解</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold">公平測試模擬器</span>
+                </div>
+                <div class="mt-5 inline-flex items-center gap-1.5 font-bold text-emerald-600 group-hover:text-emerald-700">
+                    立即開始 <span aria-hidden="true">→</span>
+                </div>
+            </a>
+        </section>
+
+        <!-- 學習目標 -->
+        <section class="mt-12 anim-card delay-2 bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-2xl">🎯</span>
+                <h2 class="text-lg font-black text-slate-800 dark:text-slate-100">本平台學習目標</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600">
+                    <div class="text-xl mb-1">🔍</div>
+                    <p class="font-bold text-slate-700 dark:text-slate-100">觀察與假設</p>
+                    <p class="text-slate-500 dark:text-slate-300 mt-1 leading-relaxed">學習從觀察現象出發，提出可被驗證的科學假設。</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600">
+                    <div class="text-xl mb-1">⚖️</div>
+                    <p class="font-bold text-slate-700 dark:text-slate-100">公平測試</p>
+                    <p class="text-slate-500 dark:text-slate-300 mt-1 leading-relaxed">掌握「每次只改變一個變數」的公平測試核心原則。</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-600">
+                    <div class="text-xl mb-1">📊</div>
+                    <p class="font-bold text-slate-700 dark:text-slate-100">變數辨異</p>
+                    <p class="text-slate-500 dark:text-slate-300 mt-1 leading-relaxed">區分獨立變數、因變數與對照變數，設計有效實驗。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-900 text-slate-300">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-sm">科學探究學習中心 · 中學科學科互動教材</p>
+            <p class="text-xs text-slate-500">互動測驗與實務模擬 · 隨時動手探索科學</p>
+        </div>
+    </footer>
+
+    <script>
+        // 暗色模式切換
+        function toggleDarkMode() {
+            const body = document.body;
+            const btn = document.getElementById('dark-toggle');
+            const isDark = body.classList.contains('dark');
+            if (isDark) {
+                body.classList.remove('dark');
+                btn.textContent = '🌙';
+            } else {
+                body.classList.add('dark');
+                btn.textContent = '☀️';
+            }
+        }
+    </script>
+</body>
+</html>
+
