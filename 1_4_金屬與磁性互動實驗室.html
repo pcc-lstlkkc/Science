@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>活動1.4 科學探究的步驟 - 金屬與磁性</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+    
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f0f4f8;
+      font-size: 1.125rem;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Magnet style & Dragging animation */
+    #magnet {
+      touch-action: none;
+      transition: transform 0.05s linear, box-shadow 0.2s ease;
+      cursor: grab;
+      z-index: 50;
+    }
+
+    #magnet:active {
+      cursor: grabbing;
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    /* Metal Object Styles */
+    .metal-item {
+      touch-action: none;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .metal-item:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Attracted animation when magnetic */
+    .attracting-spark {
+      animation: pulseSpark 0.4s infinite alternate;
+    }
+
+    @keyframes pulseSpark {
+      0% { filter: drop-shadow(0 0 4px #f43f5e); }
+      100% { filter: drop-shadow(0 0 15px #f43f5e); }
+    }
+
+    /* Magnetic field line ripples */
+    .magnetic-field-ring {
+      position: absolute;
+      border: 2px dashed rgba(244, 63, 94, 0.4);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: spinRings 8s linear infinite;
+    }
+
+    @keyframes spinRings {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Top Header -->
+  <header class="bg-teal-700 text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <span class="bg-teal-900 text-teal-200 text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider">科學探究</span>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">活動 1.4 金屬與磁性實驗室</h1>
+      </div>
+      <div class="bg-rose-500 text-white text-base font-bold px-4 py-1.5 rounded-lg shadow-sm">
+        SPS: OB, IN, PA, IF
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto w-full px-4 py-6 flex-grow space-y-8">
+
+    <!-- Introduction Card -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200">
+      <div class="grid md:grid-cols-3 gap-6 items-center">
+        <div class="md:col-span-2 space-y-4">
+          <div class="inline-flex items-center gap-2 text-teal-700 text-xl font-bold bg-teal-50 px-3 py-1 rounded-md">
+            <i class="fa-solid fa-flask"></i> 情境探究
+          </div>
+          <p class="text-lg md:text-xl leading-relaxed text-gray-700">
+            家琪觀察到<span class="font-bold text-teal-800 border-b-2 border-teal-500 px-1">金屬萬字夾具有磁性</span>，即是它會受磁石所吸引。為了解釋這個觀察結果，她提出了一個假設：<span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">所有金屬物件都具有磁性。</span>
+          </p>
+          <p class="text-base md:text-lg text-gray-600 font-medium">
+            現在，請移動或按壓實驗室中的磁石，驗證她的假設是否成立！
+          </p>
+        </div>
+        <!-- Character Speech Bubble -->
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 text-center relative shadow-sm">
+          <div class="text-amber-900 font-bold text-lg md:text-xl mb-2">
+            「是否所有金屬物件都會受磁石所吸引呢？」
+          </div>
+          <div class="text-6xl text-rose-500 my-2">
+            <i class="fa-solid fa-magnet animate-bounce"></i>
+          </div>
+          <p class="text-sm text-gray-500">動手拖拽上方磁石試一試吧！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 1 & 2 Section -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Step 1 -->
+      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-teal-700 mb-4 flex items-center gap-2">
+            <span class="bg-teal-100 text-teal-800 w-9 h-9 rounded-full inline-flex items-center justify-center text-lg">1</span>
+            步驟 1：觀察
+          </h2>
+          <label class="block text-lg font-semibold text-gray-700 mb-2">家琪觀察到甚麼？</label>
+          <div class="flex items-center gap-2 text-lg">
+            <span>磁石能夠</span>
+            <input type="text" id="obs-input" readonly
+                   value="吸引金屬萬字夾。"
+                   class="flex-1 bg-amber-50 border-b-2 border-rose-500 font-bold text-rose-600 px-3 py-2 text-xl focus:outline-none">
+          </div>
+        </div>
+        <p class="text-sm text-gray-400 mt-4">* 觀察：萬字夾被磁石所吸引。</p>
+      </section>
+
+      <!-- Step 2 -->
+      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-teal-700 mb-4 flex items-center gap-2">
+            <span class="bg-teal-100 text-teal-800 w-9 h-9 rounded-full inline-flex items-center justify-center text-lg">2</span>
+            步驟 2：提出假設
+          </h2>
+          <label class="block text-lg font-semibold text-gray-700 mb-2">家琪提出了甚麼假設？</label>
+          <div class="flex items-center gap-2 text-lg">
+            <input type="text" id="hyp-input" readonly
+                   value="所有金屬物件都具有磁性。"
+                   class="w-full bg-amber-50 border-b-2 border-rose-500 font-bold text-rose-600 px-3 py-2 text-xl focus:outline-none">
+          </div>
+        </div>
+        <p class="text-sm text-gray-400 mt-4">* 假設：推測所有金屬都具有磁性。</p>
+      </section>
+    </div>
+
+    <!-- Step 3: Interactive Experiment Lab with Increased Area Height -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold text-teal-700 flex items-center gap-2">
+            <span class="bg-teal-100 text-teal-800 w-10 h-10 rounded-full inline-flex items-center justify-center text-xl">3</span>
+            步驟 3：設計並進行實驗
+          </h2>
+          <p class="text-gray-600 text-base md:text-lg mt-1">
+            用滑鼠/手指拖拽磁石靠近各物件，或點選物件測試磁性。
+          </p>
+        </div>
+        <div class="flex gap-3">
+          <button id="reset-exp-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2 text-lg shadow-sm">
+            <i class="fa-solid fa-rotate-right"></i> 重置並隨機打亂
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Lab Stage - Extended Height (min-h-[640px]) -->
+      <div id="lab-container" class="relative bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl p-6 border-4 border-slate-700 min-h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl">
+        
+        <!-- Field Rings around Canvas -->
+        <div id="field-ring" class="magnetic-field-ring w-[220px] h-[220px] top-1/2 left-1/2 hidden"></div>
+
+        <!-- Top Status Bar -->
+        <div class="flex justify-between items-center text-white z-10 pointer-events-none">
+          <div class="bg-slate-800/80 backdrop-blur border border-slate-600 px-4 py-2 rounded-xl text-base font-semibold">
+            已測試物件：<span id="tested-count" class="text-rose-400 font-extrabold text-2xl">0</span> / 9
+          </div>
+          <div id="drag-hint" class="bg-rose-500/80 animate-pulse backdrop-blur text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2">
+            <i class="fa-solid fa-hand-pointer"></i> 拖動磁石靠近物品進行測試！
+          </div>
+        </div>
+
+        <!-- Interactive Workbench (Items dynamically placed) - Extended Height (h-[500px]) -->
+        <div id="workbench" class="relative w-full h-[500px] my-4 rounded-xl border border-slate-700/50 bg-slate-900/40">
+          
+          <!-- Magnet Element -->
+          <div id="magnet" class="absolute top-4 left-4 bg-gradient-to-br from-rose-500 to-rose-700 text-white rounded-2xl p-3 flex flex-col items-center justify-center w-24 h-24 border-4 border-rose-300 shadow-2xl">
+            <div class="flex gap-1.5 text-2xl font-black">
+              <span class="text-white">N</span>
+              <span class="text-slate-300">S</span>
+            </div>
+            <i class="fa-solid fa-magnet text-3xl mt-0.5"></i>
+            <span class="text-[10px] font-bold tracking-wider uppercase bg-rose-900/60 px-1.5 py-0.5 rounded mt-0.5">強力磁石</span>
+          </div>
+
+          <!-- Items Grid Container -->
+          <div id="metal-items-container" class="w-full h-full relative">
+            <!-- Dynamic Randomized Metal Items Injected Here -->
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Step 4: Data Analysis -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b pb-4">
+        <h2 class="text-2xl md:text-3xl font-bold text-teal-700 flex items-center gap-2">
+          <span class="bg-teal-100 text-teal-800 w-10 h-10 rounded-full inline-flex items-center justify-center text-xl">4</span>
+          步驟 4：分析實驗結果
+        </h2>
+        <p class="text-gray-600 text-base md:text-lg mt-1">
+          根據實驗紀錄，物件自動歸類如下：
+        </p>
+      </div>
+
+      <!-- Classification Table -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Magnetic Column -->
+        <div class="border-2 border-rose-300 bg-rose-50/50 rounded-2xl p-5 space-y-3">
+          <div class="bg-rose-500 text-white font-bold text-xl p-3 rounded-xl text-center shadow-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-magnet"></i> 具有磁性的物件（受磁石吸引）
+          </div>
+          <div id="magnetic-list" class="min-h-[200px] bg-white rounded-xl p-4 border border-rose-200 space-y-2 flex flex-col justify-start">
+            <p class="text-gray-400 text-center italic my-auto text-base" id="magnetic-empty-tip">拖拽磁石吸附具有磁性的金屬物件...</p>
+          </div>
+        </div>
+
+        <!-- Non-Magnetic Column -->
+        <div class="border-2 border-slate-300 bg-slate-50/50 rounded-2xl p-5 space-y-3">
+          <div class="bg-slate-600 text-white font-bold text-xl p-3 rounded-xl text-center shadow-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-ban"></i> 沒有磁性的物件（不受吸引）
+          </div>
+          <div id="non-magnetic-list" class="min-h-[200px] bg-white rounded-xl p-4 border border-slate-200 space-y-2 flex flex-col justify-start">
+            <p class="text-gray-400 text-center italic my-auto text-base" id="non-magnetic-empty-tip">測試非磁性物件後會歸類至此...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference Teacher Info Box -->
+      <div class="bg-amber-50/80 border-l-4 border-amber-500 p-5 rounded-r-xl space-y-2 text-base md:text-lg">
+        <div class="font-bold text-amber-900 flex items-center gap-2 text-xl">
+          <i class="fa-solid fa-lightbulb text-amber-600"></i> 科學小常識：
+        </div>
+        <ul class="list-disc list-inside text-amber-900/90 space-y-1.5 pl-2 leading-relaxed">
+          <li>有些硬幣具有磁性，例如一毫、五毫及1993年的一元硬幣。不過，有些硬幣則沒有磁性，例如兩毫、一元、兩元及十元硬幣。</li>
+          <li>不銹鋼可以具有磁性或沒有磁性，視乎它們的成分與結構而定（如餐具湯匙多數具磁性）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Step 5: Conclusion -->
+    <section class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-6">
+      <div class="border-b pb-4">
+        <h2 class="text-2xl md:text-3xl font-bold text-teal-700 flex items-center gap-2">
+          <span class="bg-teal-100 text-teal-800 w-10 h-10 rounded-full inline-flex items-center justify-center text-xl">5</span>
+          步驟 5：作出結論
+        </h2>
+      </div>
+
+      <!-- Question (a) -->
+      <div class="space-y-3">
+        <label class="block text-xl font-bold text-gray-800">
+          (a) 實驗結果是否支持家琪的假設？
+        </label>
+        <div class="flex items-center gap-6 pt-1">
+          <label class="flex items-center gap-3 text-xl font-semibold cursor-pointer bg-slate-50 border-2 border-slate-200 px-6 py-3 rounded-xl hover:bg-rose-50 hover:border-rose-300 transition">
+            <input type="radio" name="support-hypothesis" value="yes" class="w-6 h-6 text-rose-600 focus:ring-rose-500">
+            <span>是</span>
+          </label>
+          <label class="flex items-center gap-3 text-xl font-semibold cursor-pointer bg-slate-50 border-2 border-slate-200 px-6 py-3 rounded-xl hover:bg-rose-50 hover:border-rose-300 transition">
+            <input type="radio" name="support-hypothesis" value="no" class="w-6 h-6 text-rose-600 focus:ring-rose-500">
+            <span>否</span>
+          </label>
+        </div>
+        <div id="ans-a-feedback" class="hidden text-lg font-bold mt-2"></div>
+      </div>
+
+      <!-- Question (b) -->
+      <div class="space-y-3 pt-4 border-t">
+        <label class="block text-xl font-bold text-gray-800">
+          (b) 從實驗結果你得出甚麼結論？
+        </label>
+        <div class="space-y-3">
+          <input type="text" id="conclusion-input" 
+                 value="不是所有金屬物件都具有磁性。"
+                 class="w-full bg-amber-50 border-b-2 border-rose-500 font-bold text-rose-600 px-4 py-3 text-xl md:text-2xl focus:outline-none focus:bg-amber-100 transition rounded-t-lg">
+          <p class="text-sm text-gray-500">* 正確結論：不是所有金屬物件都具有磁性（只有鐵、鎳、鈷等特定金屬及其合金具有磁性）。</p>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-end">
+        <button id="check-all-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-8 py-3.5 rounded-xl text-xl shadow-lg transition flex items-center gap-2">
+          <i class="fa-solid fa-circle-check"></i> 檢查核對答案
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-slate-300 py-6 text-center text-base border-t border-slate-700 mt-12">
+    <p>中學科學科 互動教學輔助工具 — 活動 1.4 金屬與磁性</p>
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    // Web Audio Synthesizer for Interactive Sound Effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'snap') {
+        // Metallic Snap sound
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } else if (type === 'dull') {
+        // Non-magnetic dull click
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      }
+    }
+
+    // Metal Objects Data
+    const rawMetalItems = [
+      { id: 'iron-nail', name: '鐵釘', isMagnetic: true, icon: 'fa-wrench', color: 'text-slate-200' },
+      { id: 'spoon', name: '不銹鋼湯匙', isMagnetic: true, icon: 'fa-utensils', color: 'text-slate-300' },
+      { id: 'keyring', name: '鑰匙圈', isMagnetic: true, icon: 'fa-key', color: 'text-amber-400' },
+      { id: 'binder-clip', name: '長尾夾', isMagnetic: true, icon: 'fa-paperclip', color: 'text-slate-400' },
+      { id: 'coin', name: '兩元硬幣', isMagnetic: false, icon: 'fa-coins', color: 'text-amber-300' },
+      { id: 'medal', name: '金獎牌', isMagnetic: false, icon: 'fa-award', color: 'text-yellow-400' },
+      { id: 'can', name: '鋁罐', isMagnetic: false, icon: 'fa-wine-can', color: 'text-rose-300' },
+      { id: 'copper-wire', name: '銅線', isMagnetic: false, icon: 'fa-ring', color: 'text-amber-600' },
+      { id: 'silver-chain', name: '銀項鍊', isMagnetic: false, icon: 'fa-gem', color: 'text-slate-100' }
+    ];
+
+    // State
+    let items = [];
+    let testedCount = 0;
+    let isDraggingMagnet = false;
+    let dragOffset = { x: 0, y: 0 };
+
+    // DOM Elements
+    const workbench = document.getElementById('workbench');
+    const magnet = document.getElementById('magnet');
+    const itemsContainer = document.getElementById('metal-items-container');
+    const fieldRing = document.getElementById('field-ring');
+    const magneticList = document.getElementById('magnetic-list');
+    const nonMagneticList = document.getElementById('non-magnetic-list');
+    const magneticEmptyTip = document.getElementById('magnetic-empty-tip');
+    const nonMagneticEmptyTip = document.getElementById('non-magnetic-empty-tip');
+    const testedCountEl = document.getElementById('tested-count');
+    const resetBtn = document.getElementById('reset-exp-btn');
+    const checkAllBtn = document.getElementById('check-all-btn');
+
+    // Utility: Shuffle Array
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Initialize/Reset Experiment
+    function initExperiment() {
+      // Clear UI
+      itemsContainer.innerHTML = '';
+      magneticList.innerHTML = '';
+      nonMagneticList.innerHTML = '';
+      magneticList.appendChild(magneticEmptyTip);
+      nonMagneticList.appendChild(nonMagneticEmptyTip);
+      magneticEmptyTip.classList.remove('hidden');
+      nonMagneticEmptyTip.classList.remove('hidden');
+
+      testedCount = 0;
+      testedCountEl.textContent = testedCount;
+
+      // Magnet default position
+      magnet.style.left = '20px';
+      magnet.style.top = '20px';
+
+      // Randomize layout coordinates for workbench
+      const randomizedItems = shuffle(rawMetalItems);
+      const cols = 3;
+      const rows = 3;
+      
+      const benchWidth = workbench.clientWidth || 800;
+      const benchHeight = workbench.clientHeight || 500;
+
+      items = randomizedItems.map((item, index) => {
+        // Calculate grid position with random jitter across the larger space
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+
+        const cellWidth = (benchWidth - 140) / cols;
+        const cellHeight = (benchHeight - 140) / rows;
+
+        const posX = 120 + col * cellWidth + Math.random() * (cellWidth - 100);
+        const posY = 120 + row * cellHeight + Math.random() * (cellHeight - 100);
+
+        return {
+          ...item,
+          x: Math.max(20, Math.min(posX, benchWidth - 100)),
+          y: Math.max(20, Math.min(posY, benchHeight - 100)),
+          tested: false,
+          attached: false
+        };
+      });
+
+      // Render Item Elements
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.id = `item-${item.id}`;
+        el.className = `metal-item absolute bg-slate-800/90 border-2 border-slate-600 rounded-xl p-2.5 w-24 h-24 flex flex-col items-center justify-center text-center shadow-lg`;
+        el.style.left = `${item.x}px`;
+        el.style.top = `${item.y}px`;
+
+        el.innerHTML = `
+          <i class="fa-solid ${item.icon} text-3xl mb-1 ${item.color}"></i>
+          <span class="font-bold text-white text-xs md:text-sm">${item.name}</span>
+          <span class="status-tag text-[10px] mt-1 px-1.5 py-0.5 rounded bg-slate-700 text-slate-300 font-medium">點擊/靠近</span>
+        `;
+
+        // Click event for direct touch/click
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          triggerTest(item);
+        });
+
+        itemsContainer.appendChild(el);
+      });
+    }
+
+    // Trigger Magnetic Test on an Item
+    function triggerTest(item) {
+      const el = document.getElementById(`item-${item.id}`);
+      if (!el) return;
+
+      if (item.isMagnetic) {
+        playSound('snap');
+        // Animate snap to magnet
+        const magnetRect = magnet.getBoundingClientRect();
+        const benchRect = workbench.getBoundingClientRect();
+        
+        const targetX = magnetRect.left - benchRect.left + 10;
+        const targetY = magnetRect.top - benchRect.top + 10;
+
+        el.style.left = `${targetX}px`;
+        el.style.top = `${targetY}px`;
+        el.classList.add('attracting-spark', 'border-rose-500', 'bg-rose-950/80');
+
+        const tag = el.querySelector('.status-tag');
+        tag.textContent = '吸附有磁性';
+        tag.className = 'status-tag text-[10px] mt-1 px-1.5 py-0.5 rounded bg-rose-500 text-white font-bold';
+      } else {
+        playSound('dull');
+        el.classList.add('border-slate-400');
+        setTimeout(() => el.classList.remove('border-slate-400'), 300);
+
+        const tag = el.querySelector('.status-tag');
+        tag.textContent = '無磁性';
+        tag.className = 'status-tag text-[10px] mt-1 px-1.5 py-0.5 rounded bg-slate-600 text-slate-300 font-bold';
+      }
+
+      if (!item.tested) {
+        item.tested = true;
+        testedCount++;
+        testedCountEl.textContent = testedCount;
+        addToTable(item);
+      }
+    }
+
+    // Add item to Step 4 Table
+    function addToTable(item) {
+      const targetContainer = item.isMagnetic ? magneticList : nonMagneticList;
+      const emptyTip = item.isMagnetic ? magneticEmptyTip : nonMagneticEmptyTip;
+
+      emptyTip.classList.add('hidden');
+
+      if (document.getElementById(`table-row-${item.id}`)) return;
+
+      const row = document.createElement('div');
+      row.id = `table-row-${item.id}`;
+      row.className = `flex items-center gap-3 p-2.5 rounded-xl border text-lg font-bold shadow-sm ${
+        item.isMagnetic 
+          ? 'bg-rose-50 border-rose-200 text-rose-900' 
+          : 'bg-slate-100 border-slate-300 text-slate-800'
+      }`;
+      row.innerHTML = `
+        <i class="fa-solid ${item.icon} text-2xl ${item.isMagnetic ? 'text-rose-600' : 'text-slate-600'}"></i>
+        <span>${item.name}</span>
+        <span class="ml-auto text-sm px-2.5 py-1 rounded-full font-bold ${item.isMagnetic ? 'bg-rose-200 text-rose-800' : 'bg-slate-200 text-slate-700'}">
+          ${item.isMagnetic ? '受吸引' : '不受吸引'}
+        </span>
+      `;
+
+      targetContainer.appendChild(row);
+    }
+
+    // Dragging Magnet Logic (Touch & Mouse)
+    function startDrag(e) {
+      isDraggingMagnet = true;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const rect = magnet.getBoundingClientRect();
+      dragOffset.x = clientX - rect.left;
+      dragOffset.y = clientY - rect.top;
+
+      fieldRing.classList.remove('hidden');
+    }
+
+    function onDrag(e) {
+      if (!isDraggingMagnet) return;
+      e.preventDefault();
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const benchRect = workbench.getBoundingClientRect();
+
+      let left = clientX - benchRect.left - dragOffset.x;
+      let top = clientY - benchRect.top - dragOffset.y;
+
+      // Constrain within workbench bounds
+      left = Math.max(0, Math.min(left, benchRect.width - magnet.offsetWidth));
+      top = Math.max(0, Math.min(top, benchRect.height - magnet.offsetHeight));
+
+      magnet.style.left = `${left}px`;
+      magnet.style.top = `${top}px`;
+
+      // Update Field Ring Position
+      fieldRing.style.left = `${left + magnet.offsetWidth / 2}px`;
+      fieldRing.style.top = `${top + magnet.offsetHeight / 2}px`;
+
+      // Check proximity with metal items
+      checkProximity(left + magnet.offsetWidth / 2, top + magnet.offsetHeight / 2);
+    }
+
+    function endDrag() {
+      isDraggingMagnet = false;
+      fieldRing.classList.add('hidden');
+    }
+
+    // Check proximity between Magnet and Metal Items
+    function checkProximity(magnetCenterX, magnetCenterY) {
+      items.forEach(item => {
+        const itemCenterX = item.x + 48; // half of item width
+        const itemCenterY = item.y + 48;
+
+        const distance = Math.hypot(magnetCenterX - itemCenterX, magnetCenterY - itemCenterY);
+
+        // Proximity threshold
+        if (distance < 75) {
+          triggerTest(item);
+        }
+      });
+    }
+
+    // Magnet Drag Event Listeners
+    magnet.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', endDrag);
+
+    magnet.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('touchend', endDrag);
+
+    // Reset Button Event
+    resetBtn.addEventListener('click', initExperiment);
+
+    // Check All Answers Logic
+    checkAllBtn.addEventListener('click', () => {
+      const radioChecked = document.querySelector('input[name="support-hypothesis"]:checked');
+      const feedbackA = document.getElementById('ans-a-feedback');
+
+      feedbackA.classList.remove('hidden');
+      if (radioChecked && radioChecked.value === 'no') {
+        feedbackA.className = 'text-lg font-bold mt-2 text-teal-700 bg-teal-50 p-4 rounded-xl border border-teal-200';
+        feedbackA.innerHTML = '<i class="fa-solid fa-circle-check text-xl"></i> (a) 正確！實驗結果顯示許多金屬（如鋁罐、銅線、金牌、銀鍊）不受磁石吸引，因此不支持「所有金屬都有磁性」的假設。';
+      } else {
+        feedbackA.className = 'text-lg font-bold mt-2 text-rose-600 bg-rose-50 p-4 rounded-xl border border-rose-200';
+        feedbackA.innerHTML = '<i class="fa-solid fa-circle-xmark text-xl"></i> (a) 答案不正確。正確答案應為「否」，因為實驗中有許多金屬不具磁性。';
+      }
+
+      // Auto finish remaining tests
+      items.forEach(item => {
+        if (!item.tested) triggerTest(item);
+      });
+
+      feedbackA.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initExperiment();
+    });
+  </script>
+</body>
+</html>
