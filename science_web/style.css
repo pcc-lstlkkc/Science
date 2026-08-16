@@ -385,6 +385,28 @@ body {
 }
 @media (max-width: 600px) {
   .cards--4, .cards--2, .awards-grid { grid-template-columns: 1fr; }
+
+  /* 手機版：卡片緊湊化 */
+  .card { padding: 16px 12px; }
+  .card__icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .card__title { font-size: 1rem; margin-bottom: 4px; }
+
+  /* 手機版：區塊間距縮減 */
+  .section { padding: 40px 0; }
+  .section__title { font-size: 1.4rem; }
+  .section__intro { margin-bottom: 20px; font-size: 0.95rem; }
+
+  /* 手機版：Hero 緊湊化 */
+  .hero { padding: 50px 20px; }
+  .hero__subtitle { font-size: 1rem; }
+
+  /* 手機版：獲獎卡片圖片高度縮減 */
+  .award-card__image { height: 100px; }
+  .award-card__body { padding: 12px; }
+
+  /* 手機版：橫向卡片內距縮減 */
+  .card--horizontal .card__body { padding: 16px; }
+
   .header__inner { flex-direction: column; height: auto; padding: 12px 24px; gap: 8px; }
   .header__nav { gap: 16px; }
   .hero__title { font-size: 1.6rem; }
