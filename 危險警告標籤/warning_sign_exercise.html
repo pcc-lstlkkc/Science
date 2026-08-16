@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>危險警告標籤配對練習 | 科學實驗室安全</title>
+    <meta name="description" content="配對練習：將化學危險警告標籤圖片與正確名稱配對">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { brand: { 50:'#f0fdf4',100:'#dcfce7',500:'#22c55e',600:'#16a34a',700:'#15803d' }, science: { blue:'#3b82f6', amber:'#f59e0b', rose:'#f43f5e' } }, fontFamily: { sans:['Inter','Microsoft JhengHei','PingFang TC','sans-serif'] } } } };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        :root { --bg-app:#f8fafc; --bg-card:#ffffff; --text-primary:#1e293b; --border-app:#e2e8f0; }
+        body.dark { --bg-app:#0f172a; --bg-card:#1e293b; --text-primary:#e2e8f0; --border-app:#475569; }
+        body { background-color: var(--bg-app); color: var(--text-primary); transition: background-color .4s ease, color .4s ease; }
+        @keyframes fade-up { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+        .anim-card { animation: fade-up .5s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes pop { 0%{transform:scale(.85);opacity:.5;} 60%{transform:scale(1.06);} 100%{transform:scale(1);opacity:1;} }
+        .anim-pop { animation: pop .4s ease-out both; }
+        @keyframes wiggle { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-7px);} 75%{transform:translateX(7px);} }
+        .anim-wiggle { animation: wiggle .3s ease-in-out 2; }
+        .match-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; cursor: pointer; }
+        .match-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px -8px rgba(0,0,0,.25); }
+        .match-card.selected { border-color:#0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,.25); transform: scale(1.03); }
+        .match-card.correct { border-color:#16a34a; }
+        .match-card.wrong { border-color:#ef4444; }
+        .match-card.done { cursor: default; opacity:.55; pointer-events:none; }
+        *:focus-visible { outline: 3px solid #0ea5e9; outline-offset: 2px; border-radius: 8px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- 頂部導覽 -->
+    <header class="bg-gradient-to-r from-amber-600 via-red-600 to-rose-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚠️</span>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-tight">危險警告標籤 配對練習</h1>
+                    <p class="text-xs text-rose-100 font-medium mt-0.5">科學實驗室 ● 化學品安全標誌</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="progress" class="bg-white/15 border border-white/20 px-3 py-1.5 rounded-full text-sm font-bold">已配對 0 / 6</span>
+                <button onclick="toggleDarkMode()" id="dark-toggle" class="p-2.5 rounded-xl bg-white/10 border border-white/20 hover:bg-white/25 transition text-xl" title="切換深色/淺色模式" aria-label="切換深色/淺色模式">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
+        <!-- 操作說明 -->
+        <section class="text-center mb-8 anim-card">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-bold">
+                <span>🧯</span> 請將左邊的警告標籤圖片，配對到右邊正確的危害名稱
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                點選一張圖片，再點選對應的名稱（或先點名稱再點圖片）。全部配對完成即可過關！
+            </p>
+        </section>
+
+        <!-- 使用提示訊息 -->
+        <div id="message" class="text-center mb-5 min-h-[2em] text-lg font-bold"></div>
+
+        <!-- 配對版 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 anim-card delay-1">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                <h2 class="text-center font-black text-slate-700 dark:text-slate-100 mb-4 text-lg">🖼️ 警告標籤圖片</h2>
+                <div id="image-grid" class="grid grid-cols-2 gap-4"></div>
+            </div>
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+                <h2 class="text-center font-black text-slate-700 dark:text-slate-100 mb-4 text-lg">🏷️ 危害名稱</h2>
+                <div id="name-grid" class="grid grid-cols-2 gap-4 content-start"></div>
+            </div>
+        </section>
+
+        <!-- 控制按鈕 -->
+        <div class="flex flex-wrap justify-center gap-3 mt-8 anim-card delay-2">
+            <button onclick="resetGame()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition">🔄 重新開始</button>
+            <button onclick="showAnswer()" class="px-5 py-2.5 rounded-xl bg-amber-100 text-amber-800 font-bold hover:bg-amber-200 transition">💡 顯示答案</button>
+        </div>
+
+        <!-- 過關提示框 -->
+        <div id="success-modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="success-title">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl anim-pop">
+                <div class="text-5xl mb-3">🎉</div>
+                <h2 id="success-title" class="text-2xl font-black text-slate-800 dark:text-slate-100">全部配對完成！</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">你好棒！你已正確配對所有 6 個危險警告標籤。</p>
+                <div class="mt-6 flex justify-center gap-3">
+                    <button onclick="closeModal(); resetGame();" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition">🔄 再玩一次</button>
+                    <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-100 font-bold hover:bg-slate-300 dark:hover:bg-slate-500 transition">關閉</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-900 text-slate-300">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p class="text-sm">科學實驗室安全 · 危險警告標籤配對練習</p>
+            <p class="text-xs text-slate-500">認得這些標誌，實驗更安全</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== 資料 =====
+        const HAZARDS = [
+            { name: '腐蝕性', img: '腐蝕性.png', desc: '會灼傷皮膚或損壞金屬的物質' },
+            { name: '爆炸性', img: '爆炸性.png', desc: '受撞擊或加熱可能爆炸的物質' },
+            { name: '有毒',   img: '有毒.png',   desc: '吞下、吸入或接觸皮膚有嚴重危害' },
+            { name: '易燃',   img: '易燃.png',   desc: '容易著火或助長的物質' },
+            { name: '有害',   img: '有害.png',   desc: '對身體有較輕微的傷害' },
+            { name: '刺激性', img: '刺激性.png', desc: '刺激眼睛、皮膚或呼吸系統' }
+        ];
+
+        // ===== 狀態 =====
+        let imageItems = [];
+        let nameItems = [];
+        let selectedType = null;
+        let selectedIndex = -1;
+        let matchedCount = 0;
+
+        // ===== 工具：射擊置換隨機排序 =====
+        function shuffle(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // ===== 渲染 =====
+        function render() {
+            const imgGrid = document.getElementById('image-grid');
+            const nameGrid = document.getElementById('name-grid');
+            imgGrid.innerHTML = '';
+            nameGrid.innerHTML = '';
+
+            imageItems.forEach((item, i) => {
+                const card = document.createElement('div');
+                card.className = 'match-card bg-slate-50 dark:bg-slate-700 rounded-2xl p-3 border-2 border-slate-200 dark:border-slate-600 flex flex-col items-center justify-center gap-2';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', '警告標籤圖片，編號 ' + (i + 1));
+                card.dataset.index = i;
+                if (item.matched) { card.classList.add('correct', 'done'); }
+                else if (selectedType === 'image' && selectedIndex === i) { card.classList.add('selected'); }
+                card.innerHTML =
+                    '<img src="' + item.img + '" alt="' + item.name + ' 警告標籤" class="w-20 h-20 object-contain">' +
+                    '<span class="text-xs font-bold text-slate-500 dark:text-slate-300">圖片 ' + (i + 1) + '</span>';
+                card.addEventListener('click', () => clickImage(i));
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickImage(i); } });
+                imgGrid.appendChild(card);
+            });
+
+            nameItems.forEach((item, i) => {
+                const card = document.createElement('div');
+                card.className = 'match-card bg-white dark:bg-slate-600 rounded-2xl p-4 border-2 border-slate-200 dark:border-slate-500 text-center';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', '危害名稱：' + item.name);
+                card.dataset.index = i;
+                if (item.matched) { card.classList.add('correct', 'done'); }
+                else if (selectedType === 'name' && selectedIndex === i) { card.classList.add('selected'); }
+                card.innerHTML =
+                    '<span class="text-lg font-black text-slate-700 dark:text-slate-100">' + item.name + '</span>' +
+                    '<span class="block text-xs text-slate-400 dark:text-slate-400 mt-1">' + item.desc + '</span>';
+                card.addEventListener('click', () => clickName(i));
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickName(i); } });
+                nameGrid.appendChild(card);
+            });
+
+            document.getElementById('progress').textContent = '已配對 ' + matchedCount + ' / 6';
+        }
+
+        // ===== 互動邏輯 =====
+        const msg = (text, color) => {
+            const el = document.getElementById('message');
+            el.textContent = text;
+            el.className = 'text-center mb-5 min-h-[2em] text-lg font-bold ' + color;
+        };
+        const clearSelection = () => { selectedType = null; selectedIndex = -1; };
+
+        function clickImage(i) {
+            if (imageItems[i].matched) return;
+            clearSelection();
+            selectedType = 'image';
+            selectedIndex = i;
+            msg('已選取圖片 ' + (i + 1) + '，請點選右邊對應的名稱。', 'text-sky-600 dark:text-sky-400');
+            render();
+        }
+
+        function clickName(i) {
+            if (nameItems[i].matched) return;
+            if (selectedType !== 'image') {
+                clearSelection();
+                selectedType = 'name';
+                selectedIndex = i;
+                msg('已選取名稱「' + nameItems[i].name + '」，請點選左邊對應的圖片。', 'text-sky-600 dark:text-sky-400');
+                render();
+                return;
+            }
+            const imgItem = imageItems[selectedIndex];
+            const nameItem = nameItems[i];
+            const imgCard = document.querySelector('#image-grid .match-card[data-index="' + selectedIndex + '"]');
+            const nameCard = document.querySelector('#name-grid .match-card[data-index="' + i + '"]');
+
+            if (imgItem.name === nameItem.name) {
+                imgItem.matched = true;
+                nameItem.matched = true;
+                matchedCount++;
+                imgCard.className = imgCard.className.replace(' selected', '') + ' correct done';
+                nameCard.className = nameCard.className.replace(' selected', '') + ' correct done';
+                clearSelection();
+                msg('✅ 正確！「' + nameItem.name + '」配對成功。', 'text-emerald-600 dark:text-emerald-400');
+                updateProgress();
+                if (matchedCount === 6) { showSuccess(); }
+                else { render(); }
+            } else {
+                imgCard.classList.add('wrong', 'anim-wiggle');
+                nameCard.classList.add('wrong', 'anim-wiggle');
+                msg('❌ 「' + imgItem.name + '」不等於「' + nameItem.name + '」，再試一次！', 'text-rose-600 dark:text-rose-400');
+                setTimeout(() => {
+                    imgCard.classList.remove('wrong', 'anim-wiggle');
+                    nameCard.classList.remove('wrong', 'anim-wiggle');
+                    clearSelection();
+                    render();
+                }, 700);
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = '已配對 ' + matchedCount + ' / 6';
+        }
+
+        // ===== 過關 / 控制 =====
+        function showSuccess() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeModal() {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function resetGame() {
+            clearSelection();
+            matchedCount = 0;
+            imageItems = shuffle(HAZARDS).map(h => ({ ...h, matched: false }));
+            nameItems = shuffle(HAZARDS).map(h => ({ ...h, matched: false }));
+            msg('請開始配對：點選一張圖片，再點選對應的名稱。', 'text-slate-500');
+            render();
+        }
+
+        function showAnswer() {
+            msg('答案提示：腐蝕性、爆炸性、有毒、易燃、有害、刺激性——請觀察圖片特徵再試一次。', 'text-amber-600');
+        }
+
+        // ===== 暗色模式 =====
+        function toggleDarkMode() {
+            const btn = document.getElementById('dark-toggle');
+            if (document.body.classList.contains('dark')) {
+                document.body.classList.remove('dark');
+                btn.textContent = '🌙';
+            } else {
+                document.body.classList.add('dark');
+                btn.textContent = '☀️';
+            }
+        }
+
+        // ===== 初始化 =====
+        resetGame();
+    </script>
+</body>
+</html>
+

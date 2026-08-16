@@ -1,0 +1,522 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>危險警告標籤 打地鼠遊戲 | 科學實驗室安全</title>
+    <meta name="description" content="打地鼠遊戲：危險警告標籤符號一閃即逝，快點選正確名稱，連擊拿高分！">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans:['Inter','Microsoft JhengHei','PingFang TC','sans-serif'] } } } };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        :root { --bg-app:#f8fafc; --bg-card:#ffffff; --text-primary:#1e293b; --border-app:#e2e8f0; --hole-bg:#e2e8f0; --hole-border:#cbd5e1; }
+        body.dark { --bg-app:#0f172a; --bg-card:#1e293b; --text-primary:#e2e8f0; --border-app:#475569; --hole-bg:#1e293b; --hole-border:#475569; }
+        body { background-color: var(--bg-app); color: var(--text-primary); transition: background-color .4s ease, color .4s ease; }
+        button, .tap { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        .no-select, #game-screen { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+        @keyframes fade-up { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+        .anim-card { animation: fade-up .5s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes pop { 0%{transform:scale(.85);opacity:.5;} 60%{transform:scale(1.06);} 100%{transform:scale(1);opacity:1;} }
+        .anim-pop { animation: pop .4s ease-out both; }
+
+        @keyframes mole-pop { 0%{transform:scale(0);} 55%{transform:scale(1.12);} 100%{transform:scale(1);} }
+        .mole-pop { animation: mole-pop .18s ease-out both; }
+        @keyframes mole-hide { 0%{transform:scale(1);opacity:1;} 100%{transform:scale(0);opacity:0;} }
+        .mole-hide { animation: mole-hide .15s ease-in both; }
+
+        @keyframes float-up { 0%{opacity:1;transform:translate(-50%,0) scale(.8);} 20%{transform:translate(-50%,-8px) scale(1.15);} 100%{opacity:0;transform:translate(-50%,-44px) scale(1.25);} }
+        .score-float { animation: float-up .8s ease-out both; }
+
+        @keyframes shake-x { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-7px);} 40%,80%{transform:translateX(7px);} }
+        .shake { animation: shake-x .4s ease-in-out; }
+
+        @keyframes pulse-gold { 0%,100%{filter:drop-shadow(0 0 2px rgba(250,204,21,.9));} 50%{filter:drop-shadow(0 0 12px rgba(250,204,21,.9));} }
+        .gold { animation: pulse-gold .6s ease-in-out infinite; }
+
+        @keyframes banner-pop { 0%{transform:translateY(-20px) scale(.85);opacity:0;} 100%{transform:translateY(0) scale(1);opacity:1;} }
+        .banner-pop { animation: banner-pop .3s cubic-bezier(.22,1,.36,1) both; }
+        #banner { animation: banner-pop .3s cubic-bezier(.22,1,.36,1) both; }
+
+        @keyframes combo-flash { 0%{transform:scale(1);} 50%{transform:scale(1.3);} 100%{transform:scale(1);} }
+        .combo-flash { animation: combo-flash .4s ease-out; }
+
+        @keyframes timer-flash { 0%{opacity:1;} 50%{opacity:.4;} 100%{opacity:1;} }
+        .timer-flash { animation: timer-flash .25s linear 2; }
+
+        @keyframes ring-on { 0%{box-shadow:0 0 0 0 rgba(14,165,233,.5);} 100%{box-shadow:0 0 0 10px rgba(14,165,233,0);} }
+        .mole-ring { animation: ring-on .9s ease-out infinite; }
+
+        .flash-green { box-shadow: 0 0 0 4px rgba(22,163,74,.55), 0 0 18px rgba(22,163,74,.35); }
+        .flash-red { box-shadow: 0 0 0 4px rgba(239,68,68,.55), 0 0 18px rgba(239,68,68,.35); }
+        .wrong-btn { border-color:#ef4444 !important; background:#fee2e2 !important; }
+
+        .hole { position: relative; }
+        .hole .hole-face { background: var(--hole-bg); border: 2px solid var(--hole-border); box-shadow: inset 0 8px 12px rgba(0,0,0,.18), inset 0 -4px 8px rgba(255,255,255,.4); }
+        body.dark .hole .hole-face { box-shadow: inset 0 8px 12px rgba(0,0,0,.5); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+        *:focus-visible { outline: 3px solid #0ea5e9; outline-offset: 2px; border-radius: 12px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+    <!-- 頂部導覽 -->
+    <header class="bg-gradient-to-r from-amber-600 via-red-600 to-rose-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="text-2xl" id="mascot">🫎</span>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black tracking-tight leading-tight">危險警告標籤 打地鼠</h1>
+                    <p class="text-[11px] text-rose-100 font-medium">符號一閃即逝，快點對名稱！</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleMute()" id="mute-btn" class="p-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/25 transition text-lg" title="音效開關" aria-label="音效開關">🔇</button>
+                <button onclick="toggleDarkMode()" id="dark-toggle" class="p-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/25 transition text-lg" title="切換深色/淺色模式" aria-label="切換深色/淺色模式">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col">
+
+        <!-- 🎮 開始畫面 -->
+        <section id="start-screen" class="anim-card my-auto">
+            <div class="text-center bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div class="text-6xl mb-4">🫎</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-slate-100">符號地鼠大作戰</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-3 max-w-md mx-auto">
+                    警告標籤會從洞裡 <b>探出頭</b>，在牠消失前，快點選下方<b>對應的名稱</b>！
+                    連擊越多、乘數越高，越快答對分數越高！
+                </p>
+
+                <!-- 計時選擇 -->
+                <div class="flex items-center justify-center gap-2 mt-6 text-sm">
+                    <span class="font-bold text-slate-600 dark:text-slate-300">⏱️ 遊戲時間</span>
+                    <button onclick="setRound(30)" data-round="30" class="round-btn px-3 py-1.5 rounded-xl border-2 border-slate-300 text-slate-600 font-bold">30</button>
+                    <button onclick="setRound(60)" data-round="60" class="round-btn px-3 py-1.5 rounded-xl border-2 border-emerald-500 text-emerald-600 font-bold">60</button>
+                    <button onclick="setRound(90)" data-round="90" class="round-btn px-3 py-1.5 rounded-xl border-2 border-slate-300 text-slate-600 font-bold">90</button>
+                    <span class="text-slate-400">秒</span>
+                </div>
+
+                <button onclick="startCountdown()" class="mt-7 px-10 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 text-white text-xl font-black shadow-lg hover:opacity-90 active:scale-95 transition text-center inline-block">▶ 開始遊戲</button>
+
+                <p id="best-start" class="mt-4 text-sm text-amber-600 dark:text-amber-400 font-bold"></p>
+            </div>
+        </section>
+
+        <!-- 🎮 遊戲畫面 -->
+        <section id="game-screen" class="hidden no-select flex-col gap-3 sm:gap-4">
+            <!-- 計時 + 計分 -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-3 px-4 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div class="flex items-center justify-between gap-3 text-sm sm:text-base">
+                    <div class="flex items-center gap-2 font-black">
+                        <span>⭐</span><span id="score-display" class="text-xl sm:text-2xl text-amber-500">0</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-300">
+                        <span>🔥</span><span id="combo-display">連擊 0</span>
+                    </div>
+                    <div id="round-display" class="hidden text-xs font-bold text-sky-600 dark:text-sky-400">已玩 0 秒</div>
+                    <div class="flex items-center gap-2 font-black tabular-nums">
+                        <span>⏳</span><span id="time-display" class="text-xl">60</span>
+                    </div>
+                </div>
+                <div class="mt-2 h-2.5 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                    <div id="time-bar" class="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-[width] duration-500 ease-linear" style="width:100%"></div>
+                </div>
+            </div>
+
+            <!-- 地鼠場 (4x3 洞) -->
+            <div id="board" class="grid grid-cols-3 gap-2 sm:gap-3 select-none"></div>
+
+            <!-- 名稱選項 -->
+            <div id="name-options" class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3"></div>
+
+            <!-- 退出 -->
+            <button onclick="quitToMenu()" class="w-full py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition">✕ 返回選單</button>
+        </section>
+
+        <!-- 飛行簡報 -->
+        <div id="banner" class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl bg-slate-900/90 text-white text-xl sm:text-2xl font-black shadow-2xl text-center"></div>
+
+        <!-- 結束畫面 -->
+        <div id="overlay" class="hidden fixed inset-0 items-center justify-center bg-black/50 p-4 z-50" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl anim-pop">
+                <div class="text-6xl mb-3" id="overlay-emoji">🏆</div>
+                <h2 id="overlay-title" class="text-2xl font-black text-slate-800 dark:text-slate-100">時間到！</h2>
+                <p id="overlay-sub" class="text-slate-500 dark:text-slate-400 mt-2 text-sm"></p>
+                <div class="grid grid-cols-3 gap-2 my-6 text-center">
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-2xl p-3"><div class="text-2xl font-black text-slate-700 dark:text-slate-100" id="stat-score">0</div><div class="text-xs text-slate-500 mt-1">得分</div></div>
+                    <div class="bg-emerald-100 dark:bg-emerald-900/40 rounded-2xl p-3"><div class="text-2xl font-black text-emerald-600" id="stat-correct">0</div><div class="text-xs text-slate-500 mt-1">答對</div></div>
+                    <div class="bg-rose-100 dark:bg-rose-900/40 rounded-2xl p-3"><div class="text-2xl font-black text-rose-600" id="stat-wrong">0</div><div class="text-xs text-slate-500 mt-1">答錯/漏接</div></div>
+                </div>
+                <p id="new-record" class="hidden text-amber-600 dark:text-amber-400 font-black mb-2"></p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="restartGame()" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black hover:opacity-90 transition">🔄 再玩一次</button>
+                    <button onclick="quitToMenu()" class="px-5 py-3 rounded-2xl bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-100 font-black hover:opacity-90 transition">🏠 選單</button>
+                </div>
+                <p id="best-over" class="mt-4 text-xs text-slate-400"></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-900 text-slate-300">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p class="text-sm">科學實驗室安全 · 危險警告標籤 打地鼠遊戲</p>
+            <p class="text-xs text-slate-500">點對警告標籤，實驗更安全</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== 資料 =====
+        const HAZARDS = [
+            { name: '腐蝕性', img: '腐蝕性.png' },
+            { name: '爆炸性', img: '爆炸性.png' },
+            { name: '有毒',   img: '有毒.png' },
+            { name: '易燃',   img: '易燃.png' },
+            { name: '有害',   img: '有害.png' },
+            { name: '刺激性', img: '刺激性.png' }
+        ];
+
+        // ===== 狀態 =====
+        let roundTime = 60;
+        let timeLeft = roundTime;
+        let score = 0;
+        let combo = 0;
+        let maxCombo = 0;
+        let correct = 0;
+        let wrong = 0;
+        let masterRunning = false;
+        let spawnTimer = null;
+        let tickTimer = null;
+        let activeHole = null;
+        let activeHazard = null;
+        let lockInput = false;   // 檢查中鎖定，避免連點同一題
+        const soundOn = false;
+        let audioCtx = null;
+
+        // ===== 音效 (Web Audio，預設靜音) =====
+        function ensureAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function tone(freq, dur, type, vol) {
+            if (soundOn || getMutePref() === 'on') { } else return;
+            try {
+                ensureAudio();
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = type || 'sine';
+                o.frequency.value = freq;
+                g.gain.value = (vol || 0.2) * 0.4;
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start();
+                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (dur || 0.2));
+                o.stop(audioCtx.currentTime + (dur || 0.2));
+            } catch (e) {}
+        }
+        function sndCorrect() { tone(720, .12, 'square'); tone(1080, .14, 'square', .25); }
+        function sndWrong() { tone(200, .22, 'sawtooth', .28); }
+        function sndTick() { tone(880, .05, 'sine', .12); }
+        function sndLevel() { tone(523, .15, 'square'); setTimeout(()=>tone(659,.15,'square'),120); setTimeout(()=>tone(784,.2,'square'),240); }
+        function sndEnd() { tone(392,.2,'triangle'); setTimeout(()=>tone(311,.2,'triangle'),200); setTimeout(()=>tone(262,.3,'triangle'),400); }
+
+        // ===== 隨機工具 =====
+        function rndInt(n){ return Math.floor(Math.random()*n); }
+        function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=rndInt(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+        // ===== 建 12 個洞 =====
+        function buildBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                board.innerHTML +=
+                    '<div class="hole flex flex-col items-center justify-end pb-1 sm:pb-2">' +
+                    '  <div class="mole-slot relative w-full flex items-center justify-center h-16 sm:h-24" data-slot="' + i + '"></div>' +
+                    '  <div class="hole-face w-full h-2.5 sm:h-3.5 rounded-full"></div>' +
+                    '</div>';
+            }
+        }
+
+        // ===== 名稱選項 (4 個) =====
+        function renderNames(includeName) {
+            const opt = document.getElementById('name-options');
+            opt.innerHTML = '';
+            let pool = [includeName];
+            while (pool.length < 4) {
+                const h = HAZARDS[rndInt(6)];
+                if (!pool.includes(h.name)) pool.push(h.name);
+            }
+            pool = shuffle(pool);
+            pool.forEach(n => {
+                const b = document.createElement('button');
+                b.className = 'name-btn tap py-3 rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-100 font-black text-center active:scale-95 transition';
+                b.textContent = n;
+                b.style.minHeight = '52px';
+                b.addEventListener('click', () => pickName(n));
+                opt.appendChild(b);
+            });
+        }
+
+        // ===== 延遲函式 =====
+        function delay(ms){ return new Promise(res => setTimeout(res, ms)); }
+
+        // ===== 冒出一直地鼠 (一次一種，避免並發競爭) =====
+        async function spawnMole() {
+            if (!masterRunning) return;
+            if (activeHole) return;   // 已有地鼠在場，等下一波
+            const slots = document.querySelectorAll('.mole-slot');
+            const slot = slots[rndInt(slots.length)];
+            const h = HAZARDS[rndInt(6)];
+            activeHole = slot;
+            activeHazard = h;
+            slot.dataset.active = '1';
+
+            const img = document.createElement('img');
+            img.src = h.img;
+            img.alt = h.name + ' 警告標籤';
+            img.className = 'mole-pop w-14 h-14 sm:w-20 sm:h-20 object-contain gold cursor-pointer';
+            img.setAttribute('role', 'button');
+            img.setAttribute('aria-label', h.name);
+            img.addEventListener('click', onMoleTap);
+
+            // 清空可能殘留
+            const old = slot.querySelector('.mole-slot > *');
+            if (old) old.remove();
+            slot.appendChild(img);
+            renderNames(h.name);
+
+            // 停留時間隨遊戲進行縮短
+            const dwell = Math.max(1400, 2200 - Math.floor(correct * 40));
+            await delay(dwell);
+
+            // 若此題尚未答對
+            if (masterRunning && slot.dataset.active === '1') {
+                hideMole(true);
+            }
+        }
+
+        // ===== 點地鼠 =====
+        function onMoleTap(e) {
+            if (lockInput || !masterRunning) return;
+            e.stopPropagation();
+            const img = e.currentTarget;
+            const h = activeHazard;
+            lockInput = true;
+            // 正確！直接送分
+            applyCorrect(h);
+            hideMole(false);
+        }
+
+        // ===== 隱藏地鼠 =====
+        function hideMole(wasMiss) {
+            if (!activeHole) return;
+            const slot = activeHole;
+            slot.dataset.active = '';
+            const imgs = slot.querySelectorAll('img');
+            imgs.forEach(i => { try { i.removeEventListener('click', onMoleTap); } catch (err) {} i.classList.add('mole-hide'); setTimeout(()=>i.remove(), 150); });
+            if (wasMiss) {
+                wrong++;
+                combo = 0;
+                updateCombo();
+                flashScore('-', slot);
+            }
+            activeHole = null;
+            activeHazard = null;
+            lockInput = false;
+        }
+
+        // ===== 點名稱 =====
+        function pickName(name) {
+            if (lockInput || !masterRunning) return;
+            if (name === activeHazard?.name) {
+                applyCorrect(activeHazard);
+                hideMole(false);
+            } else {
+                const btns = document.querySelectorAll('.name-btn');
+                btns.forEach(b => { if (b.textContent === name) b.classList.add('wrong-btn', 'shake'); });
+                tone(200, .2, 'sawtooth', .3);
+                wrong++; combo = 0; updateCombo();
+                // 地鼠被嚇跑
+                hideMole(true);
+                lockInput = true;
+                setTimeout(()=>{ btns.forEach(b=>b.classList.remove('wrong-btn','shake')); lockInput=false; }, 400);
+            }
+        }
+
+        // ===== 正確處理 =====
+        function applyCorrect(h) {
+            correct++;
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+            const mult = combo >= 10 ? 4 : combo >= 6 ? 3 : combo >= 3 ? 2 : 1;
+            let pts = 10 * mult;
+            score += pts;
+            updateScore();
+            sndCorrect();
+            flashScore('+' + pts);
+            // 連擊展示
+            if (combo >= 3) showCombo('🔥 ' + combo + ' 連擊 ×' + mult);
+            // 升關快速 → 送一則刺激訊息
+            if (combo === 6) showBanner('⚡ 連擊加速！地鼠更快了');
+            if (combo === 12) showBanner('💥 神乎其技！');
+        }
+
+        // ===== 計時 & 倒數 =====
+        function startCountdown() {
+            renderNamesSafeReset();
+            showScreen('countdown');
+            let c = 3;
+            const big = document.createElement('div');
+            big.id = 'countdown-overlay';
+            big.className = 'fixed inset-0 z-[60] flex items-center justify-center bg-black/70';
+            const el = document.createElement('div');
+            el.className = 'text-7xl sm:text-9xl font-black text-white anim-pop';
+            big.appendChild(el);
+            document.body.appendChild(big);
+            el.textContent = c;
+            const iv = setInterval(() => {
+                c--;
+                if (c <= 0) { clearInterval(iv); if (big) big.remove(); startGame(); }
+                else { el.textContent = c; sndTick(); }
+            }, 700);
+            sndTick();
+        }
+        function startGame() {
+            // 歸零
+            timeLeft = roundTime; score = 0; combo = 0; maxCombo = 0; correct = 0; wrong = 0; lockInput = false;
+            activeHole = null; activeHazard = null;
+            masterRunning = true;
+            buildBoard();
+            updateScore(); updateCombo(); updateTime();
+            showScreen('game');
+            // 第一個地鼠立即冒出
+            spawnMole();
+            // 持續冒出
+            spawnTimer = setInterval(() => spawnMole(), 1600);
+            tickTimer = setInterval(() => {
+                timeLeft--;
+                updateTime();
+                if (timeLeft <= 5) { document.getElementById('time-display').classList.add('timer-flash','text-rose-500'); }
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+        }
+        function endGame() {
+            masterRunning = false;
+            clearInterval(spawnTimer); clearInterval(tickTimer);
+            // 清掉所有地鼠
+            document.querySelectorAll('.mole-slot').forEach(s => { s.innerHTML = ''; s.dataset.active = ''; });
+            sndEnd();
+            // 高分
+            let best = parseInt(localStorage.getItem('hazardMoleBest') || '0');
+            if (score > best) { localStorage.setItem('hazardMoleBest', score); document.getElementById('new-record').classList.remove('hidden'); }
+            document.getElementById('stat-score').textContent = score;
+            document.getElementById('stat-correct').textContent = correct;
+            document.getElementById('stat-wrong').textContent = wrong;
+            document.getElementById('best-over').textContent = '個人最佳：' + Math.max(score, best);
+            document.getElementById('new-record').textContent = '🏁 新紀錄！';
+            document.getElementById('overlay-emoji').textContent = score >= 200 ? '🏆' : score >= 120 ? '🌟' : '💪';
+            document.getElementById('overlay-title').textContent = '時間到！';
+            document.getElementById('overlay-sub').textContent = '最高連擊 ' + maxCombo + '，答對率 ' + Math.round(correct / Math.max(1, correct + wrong) * 100) + '%';
+            showOverlay(true);
+        }
+
+        // ===== UI 輔助 =====
+        function updateScore(){ document.getElementById('score-display').textContent = score; }
+        function updateCombo(){
+            const el = document.getElementById('combo-display');
+            el.textContent = combo >= 2 ? '🔥 連擊 ' + combo : '連擊 0';
+            if (combo >= 2) { el.classList.remove('combo-flash'); void el.offsetWidth; el.classList.add('combo-flash'); }
+        }
+        function updateTime(){
+            document.getElementById('time-display').textContent = Math.max(0, timeLeft);
+            document.getElementById('time-bar').style.width = Math.max(0, timeLeft / roundTime * 100) + '%';
+        }
+        function flashScore(text){
+            const el = document.createElement('div');
+            el.className = 'score-float fixed z-50 text-2xl font-black pointer-events-none';
+            el.style.left = '50%';
+            el.style.top = '40%';
+            el.textContent = text;
+            el.style.color = text.startsWith('+') ? '#16a34a' : '#ef4444';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+        function showBanner(msg){
+            const b = document.getElementById('banner');
+            b.textContent = msg;
+            b.classList.remove('hidden');
+            setTimeout(() => b.classList.add('hidden'), 1500);
+        }
+        function showCombo(msg){
+            const comb = document.getElementById('combo-display');
+            comb.textContent = msg;
+            comb.classList.remove('combo-flash'); void comb.offsetWidth; comb.classList.add('combo-flash');
+        }
+        function showScreen(which){
+            document.getElementById('start-screen').classList.toggle('hidden', which !== 'start');
+            document.getElementById('game-screen').classList.toggle('hidden', which !== 'game');
+            document.getElementById('game-screen').classList.toggle('flex', which === 'game');
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('overlay').classList.remove('flex');
+        }
+        function showOverlay(show){
+            const o = document.getElementById('overlay');
+            o.classList.toggle('hidden', !show);
+            o.classList.toggle('flex', show);
+        }
+        function renderNamesSafeReset(){ /* 初始化時不做事，開始時才建 */ }
+        function restartGame(){
+            showOverlay(false);
+            masterRunning = false;
+            clearInterval(spawnTimer); clearInterval(tickTimer);
+            startCountdown();
+        }
+        function quitToMenu(){
+            masterRunning = false;
+            clearInterval(spawnTimer); clearInterval(tickTimer);
+            document.querySelectorAll('.mole-slot').forEach(s => { s.innerHTML = ''; s.dataset.active=''; });
+            document.getElementById('best-start').textContent = localStorage.getItem('hazardMoleBest') ? '🏆 個人最佳：' + localStorage.getItem('hazardMoleBest') : '';
+            showScreen('start');
+        }
+
+        // ===== 計時選擇 =====
+        function setRound(n){
+            roundTime = n;
+            document.querySelectorAll('.round-btn').forEach(b => {
+                b.className = 'round-btn px-3 py-1.5 rounded-xl border-2 font-bold ' +
+                    (b.dataset.round == n ? 'border-emerald-500 text-emerald-600' : 'border-slate-300 text-slate-600');
+            });
+            document.getElementById('time-display').textContent = n;
+        }
+
+        // ===== 音效 / 暗色偏好 =====
+        function getMutePref(){ return localStorage.getItem('hazardMoleMute') || 'on'; }
+        function toggleMute(){
+            const btn = document.getElementById('mute-btn');
+            const cur = getMutePref();
+            const next = cur === 'off' ? 'on' : 'off';
+            localStorage.setItem('hazardMoleMute', next);
+            btn.textContent = next === 'off' ? '🔈' : '🔇';
+        }
+        function toggleDarkMode(){
+            const btn = document.getElementById('dark-toggle');
+            if (document.body.classList.contains('dark')) { document.body.classList.remove('dark'); btn.textContent = '🌙'; }
+            else { document.body.classList.add('dark'); btn.textContent = '☀️'; }
+        }
+
+        // ===== 初始化 =====
+        buildBoard();
+        const pref = getMutePref();
+        document.getElementById('mute-btn').textContent = pref === 'off' ? '🔈' : '🔇';
+        document.getElementById('best-start').textContent = localStorage.getItem('hazardMoleBest') ? '🏆 個人最佳：' + localStorage.getItem('hazardMoleBest') : '';
+    </script>
+</body>
+</html>
+
