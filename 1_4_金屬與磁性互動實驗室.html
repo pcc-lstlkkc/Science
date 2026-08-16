@@ -111,7 +111,7 @@
             家琪觀察到<span class="font-bold text-teal-800 border-b-2 border-teal-500 px-1">金屬萬字夾具有磁性</span>，即是它會受磁石所吸引。為了解釋這個觀察結果，她提出了一個假設：<span class="font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">所有金屬物件都具有磁性。</span>
           </p>
           <p class="text-base md:text-lg text-gray-600 font-medium">
-            現在，請移動或按壓實驗室中的磁石，驗證她的假設是否成立！
+            現在，請完成下方步驟 1 和 2 的選擇題，然後移動實驗室中的磁石驗證她的假設！
           </p>
         </div>
         <!-- Character Speech Bubble -->
@@ -122,46 +122,93 @@
           <div class="text-6xl text-rose-500 my-2">
             <i class="fa-solid fa-magnet animate-bounce"></i>
           </div>
-          <p class="text-sm text-gray-500">動手拖拽上方磁石試一試吧！</p>
+          <p class="text-sm text-gray-500">先回答選擇題，再動手做實驗吧！</p>
         </div>
       </div>
     </section>
 
-    <!-- Step 1 & 2 Section -->
+    <!-- Step 1 & 2 Section (Interactive Multiple Choice) -->
     <div class="grid md:grid-cols-2 gap-6">
-      <!-- Step 1 -->
-      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+      <!-- Step 1: Observation Quiz -->
+      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
         <div>
-          <h2 class="text-2xl font-bold text-teal-700 mb-4 flex items-center gap-2">
+          <h2 class="text-2xl font-bold text-teal-700 mb-3 flex items-center gap-2">
             <span class="bg-teal-100 text-teal-800 w-9 h-9 rounded-full inline-flex items-center justify-center text-lg">1</span>
-            步驟 1：觀察
+            步驟 1：觀察（選擇題）
           </h2>
-          <label class="block text-lg font-semibold text-gray-700 mb-2">家琪觀察到甚麼？</label>
-          <div class="flex items-center gap-2 text-lg">
-            <span>磁石能夠</span>
-            <input type="text" id="obs-input" readonly
-                   value="吸引金屬萬字夾。"
-                   class="flex-1 bg-amber-50 border-b-2 border-rose-500 font-bold text-rose-600 px-3 py-2 text-xl focus:outline-none">
+          <label class="block text-lg font-bold text-gray-800 mb-3">家琪觀察到甚麼？</label>
+          
+          <div class="space-y-2.5 text-base" id="step1-options">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step1-q" value="A" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">A. 磁石能夠吸引金屬萬字夾</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step1-q" value="B" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">B. 磁石能夠吸引所有金屬物件</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step1-q" value="C" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">C. 萬字夾能自動吸引其他金屬</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step1-q" value="D" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">D. 磁石無法吸引任何物件</span>
+            </label>
           </div>
+
+          <div id="step1-feedback" class="hidden mt-3 p-3 rounded-xl font-bold text-base"></div>
         </div>
-        <p class="text-sm text-gray-400 mt-4">* 觀察：萬字夾被磁石所吸引。</p>
+
+        <div class="flex items-center gap-2 pt-2 border-t">
+          <button onclick="checkStep1()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded-lg text-base shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> 核對答案
+          </button>
+          <button onclick="showStep1Answer()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-base shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-key"></i> 顯示答案
+          </button>
+        </div>
       </section>
 
-      <!-- Step 2 -->
-      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+      <!-- Step 2: Hypothesis Quiz -->
+      <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
         <div>
-          <h2 class="text-2xl font-bold text-teal-700 mb-4 flex items-center gap-2">
+          <h2 class="text-2xl font-bold text-teal-700 mb-3 flex items-center gap-2">
             <span class="bg-teal-100 text-teal-800 w-9 h-9 rounded-full inline-flex items-center justify-center text-lg">2</span>
-            步驟 2：提出假設
+            步驟 2：提出假設（選擇題）
           </h2>
-          <label class="block text-lg font-semibold text-gray-700 mb-2">家琪提出了甚麼假設？</label>
-          <div class="flex items-center gap-2 text-lg">
-            <input type="text" id="hyp-input" readonly
-                   value="所有金屬物件都具有磁性。"
-                   class="w-full bg-amber-50 border-b-2 border-rose-500 font-bold text-rose-600 px-3 py-2 text-xl focus:outline-none">
+          <label class="block text-lg font-bold text-gray-800 mb-3">家琪提出了甚麼假設？</label>
+          
+          <div class="space-y-2.5 text-base" id="step2-options">
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step2-q" value="A" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">A. 只有鐵製物件才具有磁性</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step2-q" value="B" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">B. 所有金屬物件都具有磁性</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step2-q" value="C" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">C. 磁石不能吸引任何金屬</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-teal-50 cursor-pointer transition">
+              <input type="radio" name="step2-q" value="D" class="w-5 h-5 text-teal-600 focus:ring-teal-500">
+              <span class="font-medium text-gray-700">D. 萬字夾是由非金屬材料製成的</span>
+            </label>
           </div>
+
+          <div id="step2-feedback" class="hidden mt-3 p-3 rounded-xl font-bold text-base"></div>
         </div>
-        <p class="text-sm text-gray-400 mt-4">* 假設：推測所有金屬都具有磁性。</p>
+
+        <div class="flex items-center gap-2 pt-2 border-t">
+          <button onclick="checkStep2()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2 rounded-lg text-base shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i> 核對答案
+          </button>
+          <button onclick="showStep2Answer()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-base shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-key"></i> 顯示答案
+          </button>
+        </div>
       </section>
     </div>
 
@@ -628,6 +675,69 @@
 
       feedbackA.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
+
+    // Step 1 & Step 2 Multiple Choice Question Logic
+    function checkStep1() {
+      const selected = document.querySelector('input[name="step1-q"]:checked');
+      const feedback = document.getElementById('step1-feedback');
+      feedback.classList.remove('hidden');
+
+      if (!selected) {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-amber-50 text-amber-800 border border-amber-300';
+        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 請先選擇一個答案！';
+        return;
+      }
+
+      if (selected.value === 'A') {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-teal-50 text-teal-800 border border-teal-300';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check text-teal-600"></i> 正確！家琪觀察到的具體事實是「磁石能夠吸引金屬萬字夾」。';
+      } else {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-rose-50 text-rose-800 border border-rose-300';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-600"></i> 不正確，請再思考一下何者為家琪直接觀察到的事實。';
+      }
+    }
+
+    function showStep1Answer() {
+      const options = document.querySelectorAll('input[name="step1-q"]');
+      options.forEach(opt => {
+        if (opt.value === 'A') opt.checked = true;
+      });
+      const feedback = document.getElementById('step1-feedback');
+      feedback.classList.remove('hidden');
+      feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-amber-50 text-amber-800 border border-amber-300';
+      feedback.innerHTML = '<i class="fa-solid fa-lightbulb text-amber-600"></i> 正確答案是：<strong>A. 磁石能夠吸引金屬萬字夾</strong>。';
+    }
+
+    function checkStep2() {
+      const selected = document.querySelector('input[name="step2-q"]:checked');
+      const feedback = document.getElementById('step2-feedback');
+      feedback.classList.remove('hidden');
+
+      if (!selected) {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-amber-50 text-amber-800 border border-amber-300';
+        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 請先選擇一個答案！';
+        return;
+      }
+
+      if (selected.value === 'B') {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-teal-50 text-teal-800 border border-teal-300';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check text-teal-600"></i> 正確！家琪根據萬字夾具有磁性，提出廣義假設：「所有金屬物件都具有磁性」。';
+      } else {
+        feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-rose-50 text-rose-800 border border-rose-300';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-600"></i> 不正確，請再閱讀情境，看看家琪提出的推測假設是甚麼。';
+      }
+    }
+
+    function showStep2Answer() {
+      const options = document.querySelectorAll('input[name="step2-q"]');
+      options.forEach(opt => {
+        if (opt.value === 'B') opt.checked = true;
+      });
+      const feedback = document.getElementById('step2-feedback');
+      feedback.classList.remove('hidden');
+      feedback.className = 'mt-3 p-3 rounded-xl font-bold text-base bg-amber-50 text-amber-800 border border-amber-300';
+      feedback.innerHTML = '<i class="fa-solid fa-lightbulb text-amber-600"></i> 正確答案是：<strong>B. 所有金屬物件都具有磁性</strong>。';
+    }
 
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
