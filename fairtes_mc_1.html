@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科學探究：公平測試與變數辨異 - 互動測驗與學堂</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        science: {
+                            blue: '#3b82f6',
+                            purple: '#8b5cf6',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Microsoft JhengHei', 'PingFang TC', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .pulse-subtle {
+            animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-light {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        /* Accessibility: visible focus styles */
+        *:focus-visible {
+            outline: 3px solid #16a34a;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        /* Modal animation */
+        .modal-show #quiz-modal-panel {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* =============================================
+           模組化擴充層：動畫過渡 + 暗色模式 (v2)
+        ============================================= */
+        /* --- 全域 CSS 變數（模組化色彩系統，供明/暗切換） --- */
+        :root {
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-muted: #f1f5f9;
+            --border-app: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-card: 0 1px 3px rgba(15,23,42,.08);
+        }
+        body.dark {
+            --bg-app: #0f172a;
+            --bg-card: #1e293b;
+            --bg-muted: #334155;
+            --border-app: #475569;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --shadow-card: 0 1px 3px rgba(0,0,0,.5);
+        }
+        body { background-color: var(--bg-app); transition: background-color .4s ease, color .4s ease; }
+        body.dark { color: var(--text-primary); }
+
+        /* 動畫過渡：卡片淡入上浮 */
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-card { animation: fade-up .5s cubic-bezier(.22,1,.36,1) both; }
+
+        @keyframes pop {
+            0%   { transform: scale(.8); opacity: 0; }
+            60%  { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .anim-pop { animation: pop .45s ease-out both; }
+
+        /* 蒸氣 / 浮動主題動畫（升級 SVG 趣味性） */
+        @keyframes steam-rise {
+            0%   { opacity: 0; transform: translateY(6px); }
+            30%  { opacity: .8; }
+            100% { opacity: 0; transform: translateY(-14px); }
+        }
+        .anim-steam { transform-box: fill-box; transform-origin: center; animation: steam-rise 1.8s ease-out infinite; }
+
+        @keyframes float-bob {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-4px); }
+        }
+        .anim-bob { animation: float-bob 2.6s ease-in-out infinite; }
+
+        @keyframes wiggle {
+            0%,100% { transform: rotate(0); }
+            25%     { transform: rotate(-3deg); }
+            75%     { transform: rotate(3deg); }
+        }
+        .anim-wiggle:hover { animation: wiggle .4s ease-in-out; }
+
+        /* 測驗區塊切換過渡 */
+        .tab-panel { transition: opacity .35s ease, transform .35s ease; }
+        .tab-leave { opacity: 0; transform: translateY(8px); }
+
+        /* 暗色模式下的額外樣式調整 */
+        body.dark .bg-white { background-color: var(--bg-card); color: var(--text-primary); }
+        body.dark .border-slate-200, body.dark .border-slate-100, body.dark .border-slate-300 { border-color: var(--border-app); }
+        body.dark .text-slate-800, body.dark .text-slate-700, body.dark .text-slate-900 { color: var(--text-primary); }
+        body.dark .bg-slate-50, body.dark .bg-slate-100 { background-color: var(--bg-muted); }
+        body.dark .bg-slate-50 { background-color: var(--bg-muted); }
+        body.dark .text-slate-600, body.dark .text-slate-500 { color: var(--text-secondary); }
+        body.dark .bg-emerald-50\/80, body.dark .bg-emerald-50 { background-color: #14532d; }
+        body.dark .bg-blue-50, body.dark .bg-amber-50\/60 { background-color: #1e293b; }
+        body.dark .dark\:border { border-color: var(--border-app); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+    <!-- Skip Link for keyboard accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:bg-emerald-700 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:font-bold focus:shadow-lg">
+        跳至主要內容
+    </a>
+
+    <!-- 頂部導航欄 -->
+    <header class="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-white/10 rounded-xl backdrop-blur-md border border-white/20">
+                    <svg class="w-7 h-7 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">科學探究：公平測試與變數辨異</h1>
+                    <p class="text-xs text-emerald-100 font-medium">中學科學科 ‧ 互動測驗與實務模擬</p>
+                </div>
+            </div>
+
+            <!-- 暗色模式按鈕 + 分頁切換按鈕 -->
+            <div class="flex items-center gap-2 flex-wrap justify-center">
+            <button id="dark-toggle" onclick="toggleDarkMode()" class="p-2 rounded-xl bg-white/10 border border-white/20 hover:bg-white/25 transition text-lg leading-none" title="切換深色/淺色模式" aria-label="切換深色/淺色模式">🌙</button>
+            <nav class="flex bg-black/20 p-1 rounded-xl text-sm font-medium border border-white/10" role="tablist" aria-label="主要功能分頁">
+                <button id="tab-quiz-btn" onclick="switchTab('quiz')" role="tab" aria-selected="true" aria-controls="tab-quiz" tabindex="0" class="px-4 py-1.5 rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow-md font-semibold">
+                    📝 20題互動測驗
+                </button>
+                <button id="tab-learn-btn" onclick="switchTab('learn')" role="tab" aria-selected="false" aria-controls="tab-learn" tabindex="-1" class="px-4 py-1.5 rounded-lg transition-all duration-200 text-white hover:text-emerald-200">
+                    💡 概念圖解學堂
+                </button>
+                <button id="tab-sim-btn" onclick="switchTab('sim')" role="tab" aria-selected="false" aria-controls="tab-sim" tabindex="-1" class="px-4 py-1.5 rounded-lg transition-all duration-200 text-white hover:text-emerald-200">
+                    🧪 公平測試模擬器
+                </button>
+            </nav>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: 20題互動測驗                        -->
+        <!-- ========================================== -->
+        <section id="tab-quiz" class="space-y-6" role="tabpanel" aria-labelledby="tab-quiz-btn">
+            <!-- Screen reader announcements -->
+            <div id="sr-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+            <!-- 測驗頂部控制與進度列 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="relative w-14 h-14 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 font-extrabold text-lg border border-emerald-200">
+                        <span id="quiz-progress-text">1/20</span>
+                    </div>
+                    <div>
+                        <h2 id="quiz-question-title-num" class="text-lg font-bold text-slate-800">第 1 題 / 共 20 題</h2>
+                        <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                            <span id="quiz-category-tag" class="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-medium">基本概念</span>
+                            <span>• 點選最佳答案並可查看詳細變數拆解</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分數與控制鈕 -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-slate-100 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                        <span>目前得分:</span>
+                        <span id="live-score" class="text-emerald-600 text-sm font-bold">0</span>
+                        <span>/ 20</span>
+                    </div>
+                    <button onclick="resetQuiz()" class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+                        🔄 重新開始
+                    </button>
+                </div>
+            </div>
+
+            <!-- 進度條 -->
+            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                <div id="quiz-progress-bar" class="bg-emerald-500 h-full transition-all duration-300 rounded-full" style="width: 5%;"></div>
+            </div>
+
+            <!-- 題目主要區域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側：問題內容與選項 -->
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 transition-all">
+                        
+                        <!-- 題目動態圖像插圖 -->
+                        <div id="question-illustration" class="mb-5 bg-slate-50 border border-slate-100 rounded-xl p-5 min-h-[150px] flex justify-center items-center">
+                            <!-- 插圖將由 JavaScript 動態生成 -->
+                        </div>
+
+                        <!-- 題目內文 -->
+                        <div id="question-text" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed mb-6">
+                            載入中...
+                        </div>
+
+                        <!-- 選項列表 -->
+                        <div id="options-container" class="space-y-3">
+                            <!-- 動態渲染選項 -->
+                        </div>
+
+                        <!-- 解析與變數拆解卡片 (預設隱藏) -->
+                        <div id="explanation-card" class="mt-6 hidden p-4 rounded-xl border bg-emerald-50/80 border-emerald-200 text-slate-700 space-y-3 animate-fade-in">
+                            <div class="flex items-center gap-2 font-bold text-emerald-800">
+                                <span id="explain-icon">💡</span>
+                                <span id="explain-title">解析與變數拆解</span>
+                            </div>
+                            <p id="explain-text" class="text-sm leading-relaxed text-slate-700"></p>
+                            
+                            <!-- 三大變數對照小表 -->
+                            <div id="variable-breakdown" class="grid grid-cols-3 gap-2 pt-2 text-xs border-t border-emerald-200/60">
+                                <div class="bg-blue-50 p-2 rounded-lg border border-blue-100">
+                                    <div class="font-bold text-blue-700 mb-0.5">獨立變數 (改變)</div>
+                                    <div id="vb-iv" class="text-slate-600">--</div>
+                                </div>
+                                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100">
+                                    <div class="font-bold text-amber-700 mb-0.5">因變數 (量度)</div>
+                                    <div id="vb-dv" class="text-slate-600">--</div>
+                                </div>
+                                <div class="bg-emerald-100/60 p-2 rounded-lg border border-emerald-200">
+                                    <div class="font-bold text-emerald-800 mb-0.5">對照變數 (不變)</div>
+                                    <div id="vb-cv" class="text-slate-600">--</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 底部按鈕導航 -->
+                        <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
+                            <button id="prev-btn" onclick="prevQuestion()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                                ← 上一題
+                            </button>
+                            <button id="next-btn" onclick="nextQuestion()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow-md transition">
+                                下一題 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右側：20 題速查網格與評分總結 -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- 題目速查板 -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center justify-between">
+                            <span>答題狀態速查 (20題)</span>
+                            <span class="text-xs font-normal text-slate-500">點擊可跳題</span>
+                        </h3>
+                        <div id="question-grid" class="grid grid-cols-5 gap-2">
+                            <!-- 1-20 題按鈕由 JS 產生 -->
+                        </div>
+                    </div>
+
+                    <!-- 課本對照秘笈卡片 -->
+                    <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                            <span>🔑 變數快速判斷記憶法</span>
+                        </div>
+                        <ul class="space-y-2 text-xs text-indigo-100">
+                            <li class="flex items-start gap-2">
+                                <span class="bg-blue-500 text-white px-1.5 py-0.5 rounded font-bold text-[10px] shrink-0">獨立</span>
+                                <span><b>「我主動改變的」</b>：兩組實驗間唯一不同的項目。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="bg-amber-500 text-white px-1.5 py-0.5 rounded font-bold text-[10px] shrink-0">因變數</span>
+                                <span><b>「我最後量度的」</b>：最後讀取的數據或觀察結果。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="bg-emerald-500 text-white px-1.5 py-0.5 rounded font-bold text-[10px] shrink-0">對照</span>
+                                <span><b>「我鎖定相同的」</b>：確保公平而必須全相同的條件。</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: 概念圖解學堂 (參考教科書情境)       -->
+        <!-- ========================================== -->
+        <section id="tab-learn" class="hidden space-y-8" role="tabpanel" aria-labelledby="tab-learn-btn">
+            <!-- 觀念總覽 header -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                    <span>📚 科學探究核心：什麼是「公平測試」？</span>
+                </h2>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    在科學實驗中，往往有許多因素（又稱<b>變數 variable</b>）會影響實驗結果。要確定某個因素的實際影響，我們必須進行<b>公平測試 (Fair Test)</b>——<b>每次只改變 1 個想探究的變數，並將其他所有變數嚴格保持不變</b>。
+                </p>
+            </div>
+
+            <!-- 教科書情境圖解 1：活動 1.5 - 杯子保溫測試 -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div class="md:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
+                    <div class="text-xs font-bold text-slate-500 mb-2">【活動 1.5 情境】紙杯 vs 發泡膠杯保溫能力</div>
+                    <!-- SVG 保溫實驗插圖 -->
+                    <svg class="w-full h-48" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 杯子 A (紙杯) -->
+                        <rect x="40" y="70" width="70" height="85" rx="6" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                        <path d="M40 70 L45 155 L105 155 L110 70 Z" fill="#fbbf24" opacity="0.4"/>
+                        <!-- 溫度計 A -->
+                        <rect x="72" y="20" width="6" height="110" rx="3" fill="#e2e8f0" stroke="#64748b"/>
+                        <circle cx="75" cy="125" r="8" fill="#ef4444"/>
+                        <rect x="73.5" y="40" width="3" height="85" fill="#ef4444"/>
+                        <text x="45" y="173" font-size="11" font-weight="bold" fill="#78350f">紙杯 (100 cm³ 水)</text>
+
+                        <!-- 杯子 B (發泡膠杯) -->
+                        <rect x="210" y="70" width="70" height="85" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+                        <!-- 溫度計 B -->
+                        <rect x="242" y="20" width="6" height="110" rx="3" fill="#e2e8f0" stroke="#64748b"/>
+                        <circle cx="245" cy="125" r="8" fill="#ef4444"/>
+                        <rect x="243.5" y="60" width="3" height="65" fill="#ef4444"/>
+                        <text x="205" y="173" font-size="11" font-weight="bold" fill="#334155">發泡膠杯 (100 cm³ 水)</text>
+
+                        <!-- 熱水蒸氣符號 (加入蒸氣上升動畫) -->
+                        <path class="anim-steam" d="M65 60 Q70 50 65 40" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                        <path class="anim-steam" style="animation-delay:.4s" d="M85 60 Q90 50 85 40" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                        <path class="anim-steam" style="animation-delay:.8s" d="M235 60 Q240 50 235 40" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                        <path class="anim-steam" style="animation-delay:.2s" d="M255 60 Q260 50 255 40" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+
+                <div class="md:col-span-7 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-800">變數三兄弟對照表（以保溫測試為例）</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b-2 border-slate-200 bg-slate-100">
+                                    <th class="p-2.5 font-bold text-slate-700">變數種類</th>
+                                    <th class="p-2.5 font-bold text-slate-700">核心定義</th>
+                                    <th class="p-2.5 font-bold text-emerald-700">本實驗具體項目</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-2.5 font-bold text-blue-600 bg-blue-50/50">獨立變數</td>
+                                    <td class="p-2.5 text-slate-600">實驗中<b>唯一主動改變</b>的因素</td>
+                                    <td class="p-2.5 font-semibold text-slate-800">杯的種類（紙杯 vs 發泡膠杯）</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-amber-600 bg-amber-50/50">因變數 (應變數)</td>
+                                    <td class="p-2.5 text-slate-600">實驗中<b>隨之變化並需要量度</b>的結果</td>
+                                    <td class="p-2.5 font-semibold text-slate-800">20分鐘後的水溫 (°C)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-emerald-700 bg-emerald-50/50">對照變數</td>
+                                    <td class="p-2.5 text-slate-600">實驗中<b>必須保持完全相同</b>的其他因素</td>
+                                    <td class="p-2.5 text-slate-700">
+                                        • 開始時的水溫 (70°C)<br>
+                                        • 水的體積 (100 cm³)<br>
+                                        • 杯的大小與形狀
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 教科書情境圖解 2：活動 1.6 - 紙巾堅韌度測試 -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                <div class="md:col-span-7 space-y-3">
+                    <div class="inline-block px-2.5 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">
+                        活動 1.6 課本範例
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">紙巾堅韌度測試 (Paper Towel Strength Test)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        卓賢進行實驗，希望找出 A 牌子的紙巾是否比其他品牌更堅韌。他利用鐵架與夾子固定紙巾，並在下方逐一掛上砝碼，直到紙巾斷裂為止。
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-2 pt-2">
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="text-xs font-bold text-blue-600 block mb-1">獨立變數</span>
+                            <span class="text-xs text-slate-700 font-medium">紙巾的品牌 (A牌 vs 其他牌)</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="text-xs font-bold text-amber-600 block mb-1">因變數</span>
+                            <span class="text-xs text-slate-700 font-medium">紙巾斷裂前能承受的砝碼數量</span>
+                        </div>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <span class="text-xs font-bold text-emerald-600 block mb-1">對照變數</span>
+                            <span class="text-xs text-slate-700 font-medium">紙巾的闊度、長度、掛砝碼速度</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 鐵架與砝碼 SVG 插圖 -->
+                <div class="md:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-center">
+                    <svg class="w-48 h-56" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 底座與支架 -->
+                        <rect x="20" y="200" width="160" height="12" rx="3" fill="#475569"/>
+                        <rect x="50" y="20" width="10" height="180" fill="#64748b"/>
+                        <rect x="50" y="30" width="90" height="8" rx="2" fill="#64748b"/>
+                        <!-- 夾子 -->
+                        <rect x="110" y="28" width="20" height="16" fill="#334155" rx="2"/>
+                        <!-- 紙巾條 (搖晃動畫) -->
+                        <rect class="anim-bob" x="116" y="44" width="8" height="80" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <text x="128" y="85" font-size="10" fill="#64748b" font-weight="bold">A牌紙巾</text>
+                        <!-- 下方夾子與鈎 -->
+                        <rect x="110" y="124" width="20" height="12" fill="#334155" rx="2"/>
+                        <path d="M120 136 L120 150" stroke="#334155" stroke-width="2"/>
+                        <!-- 砝碼群 -->
+                        <rect class="anim-bob" x="108" y="150" width="24" height="12" rx="2" fill="#0284c7" stroke="#0369a1"/>
+                        <rect class="anim-bob" style="animation-delay:.4s" x="108" y="164" width="24" height="12" rx="2" fill="#0284c7" stroke="#0369a1"/>
+                        <rect class="anim-bob" style="animation-delay:.8s" x="108" y="178" width="24" height="12" rx="2" fill="#0284c7" stroke="#0369a1"/>
+                        <text x="140" y="170" font-size="11" fill="#0369a1" font-weight="bold">砝碼</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 模組化擴充層 3：卡通插畫 + 免費圖庫資源推薦 (v2) -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="p-2.5 bg-gradient-to-br from-rose-100 to-amber-100 rounded-2xl text-2xl">🎨</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">畫出你的科學：卡通插畫與免費圖庫資源</h3>
+                        <p class="text-xs text-slate-500">卡通插畫能幫助讀者立即理解實驗情境，也讓學習變得更輕鬆有趣。以下推薦 <b>免費商用授權</b> 的插畫資源庫：</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+                    <!-- unDraw -->
+                    <a href="https://undraw.co" target="_blank" rel="noopener" class="group block bg-rose-50 border border-rose-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">🖌️</div>
+                        <div class="font-bold text-slate-800 group-hover:text-rose-600 text-sm">unDraw</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">500+ SVG 插畫，<b>MIT 授權</b>，線上「一鍵換色」完美配合你的品牌配色。</p>
+                    </a>
+                    <!-- ManyPixels -->
+                    <a href="https://www.manypixels.co/gallery" target="_blank" rel="noopener" class="group block bg-blue-50 border border-blue-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">🧩</div>
+                        <div class="font-bold text-slate-800 group-hover:text-blue-600 text-sm">ManyPixels</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">2500+ 高質感插畫，含<b>等角 (isometric) 風格</b>，適合製作實驗流程圖。</p>
+                    </a>
+                    <!-- Open Peeps / Humaaans -->
+                    <a href="https://www.openpeeps.com" target="_blank" rel="noopener" class="group block bg-amber-50 border border-amber-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">👩‍🔬</div>
+                        <div class="font-bold text-slate-800 group-hover:text-amber-600 text-sm">Open Peeps / Humaaans</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed"><b>CC0 人物插畫</b>，髮型、表情、配件可自由組合，輕鬆創造「小小科學家」角色。</p>
+                    </a>
+                    <!-- DrawKit -->
+                    <a href="https://drawkit.com" target="_blank" rel="noopener" class="group block bg-purple-50 border border-purple-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">🧪</div>
+                        <div class="font-bold text-slate-800 group-hover:text-purple-600 text-sm">DrawKit</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">主題式插畫包，含<b> 3D 與 Lottie 動畫</b>版本，為教材加入生動動態元素。</p>
+                    </a>
+                    <!-- Storyset -->
+                    <a href="https://storyset.com" target="_blank" rel="noopener" class="group block bg-teal-50 border border-teal-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">🎬</div>
+                        <div class="font-bold text-slate-800 group-hover:text-teal-600 text-sm">Storyset</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">可<b>自訂顏色與動畫</b>的場景插畫，適合製作科學探究敘事情境。</p>
+                    </a>
+                    <!-- LottieFiles -->
+                    <a href="https://lottiefiles.com" target="_blank" rel="noopener" class="group block bg-indigo-50 border border-indigo-100 rounded-2xl p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 anim-wiggle">
+                        <div class="text-3xl mb-2">✨</div>
+                        <div class="font-bold text-slate-800 group-hover:text-indigo-600 text-sm">LottieFiles</div>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed"><b>輕量級動畫插畫</b>，SVG/JSON 節省頻寬，讓頁面動畫流暢不卡頓。</p>
+                    </a>
+                </div>
+
+                <!-- 使用提示 -->
+                <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 leading-relaxed">
+                    💡 <b>使用提示</b>：選用插畫請務必查閱各圖庫最新的授權條款；如要發佈給學生使用，優先挑選 <b>CC0 / MIT</b> 等可商用與可修改的授權，並可於本頁的「🎨 插畫區」直接嵌入 SVG 原始碼，離線也能顯示。
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: 公平測試模擬器 (互動沙盒)          -->
+        <!-- ========================================== -->
+        <section id="tab-sim" class="hidden space-y-6" role="tabpanel" aria-labelledby="tab-sim-btn">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="p-2 bg-emerald-100 text-emerald-700 rounded-xl text-lg">🧪</span>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-800">公平測試診斷模擬器：食鹽溶解速度測試</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">調整甲、乙兩杯水實驗條件，觀察系統如何即時診斷是否符合「公平測試」！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模擬器控制台與視覺化 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制板：甲杯與乙杯設定 -->
+                <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- 甲杯設定 -->
+                        <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-200 space-y-4">
+                            <div class="flex justify-between items-center border-b border-blue-200 pb-2">
+                                <span class="font-bold text-blue-900 flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> 燒杯 甲
+                                </span>
+                                <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded">對照組/測試組1</span>
+                            </div>
+
+                            <!-- 水溫 -->
+                            <div>
+                                <label for="sim-tempA" class="text-xs font-bold text-slate-600 flex justify-between">
+                                    <span>水溫 (°C):</span>
+                                    <span id="sim-tempA-val" class="text-blue-600 font-bold">20°C</span>
+                                </label>
+                                <input type="range" id="sim-tempA" min="10" max="90" value="20" step="5" oninput="updateSim()" class="w-full accent-blue-600" aria-describedby="sim-tempA-val">
+                            </div>
+
+                            <!-- 水體積 -->
+                            <div>
+                                <label for="sim-volA" class="text-xs font-bold text-slate-600 flex justify-between">
+                                    <span>水量 (mL):</span>
+                                    <span id="sim-volA-val" class="text-blue-600 font-bold">100 mL</span>
+                                </label>
+                                <input type="range" id="sim-volA" min="50" max="200" value="100" step="10" oninput="updateSim()" class="w-full accent-blue-600" aria-describedby="sim-volA-val">
+                            </div>
+
+                            <!-- 攪拌速度 -->
+                            <div>
+                                <label for="sim-stirA" class="text-xs font-bold text-slate-600 block mb-1">攪拌速度:</label>
+                                <select id="sim-stirA" onchange="updateSim()" class="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white" aria-describedby="sim-stirA-desc">
+                                    <option value="fast">快速攪拌 (120 rpm)</option>
+                                    <option value="medium" selected>中速攪拌 (60 rpm)</option>
+                                    <option value="none">不攪拌 (0 rpm)</option>
+                                </select>
+                                <span id="sim-stirA-desc" class="sr-only">選擇甲杯的攪拌速度</span>
+                            </div>
+                        </div>
+
+                        <!-- 乙杯設定 -->
+                        <div class="bg-purple-50/60 p-4 rounded-2xl border border-purple-200 space-y-4">
+                            <div class="flex justify-between items-center border-b border-purple-200 pb-2">
+                                <span class="font-bold text-purple-900 flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span> 燒杯 乙
+                                </span>
+                                <span class="text-xs bg-purple-100 text-purple-800 font-semibold px-2 py-0.5 rounded">測試組2</span>
+                            </div>
+
+                            <!-- 水溫 -->
+                            <div>
+                                <label for="sim-tempB" class="text-xs font-bold text-slate-600 flex justify-between">
+                                    <span>水溫 (°C):</span>
+                                    <span id="sim-tempB-val" class="text-purple-600 font-bold">80°C</span>
+                                </label>
+                                <input type="range" id="sim-tempB" min="10" max="90" value="80" step="5" oninput="updateSim()" class="w-full accent-purple-600" aria-describedby="sim-tempB-val">
+                            </div>
+
+                            <!-- 水體積 -->
+                            <div>
+                                <label for="sim-volB" class="text-xs font-bold text-slate-600 flex justify-between">
+                                    <span>水量 (mL):</span>
+                                    <span id="sim-volB-val" class="text-purple-600 font-bold">100 mL</span>
+                                </label>
+                                <input type="range" id="sim-volB" min="50" max="200" value="100" step="10" oninput="updateSim()" class="w-full accent-purple-600" aria-describedby="sim-volB-val">
+                            </div>
+
+                            <!-- 攪拌速度 -->
+                            <div>
+                                <label for="sim-stirB" class="text-xs font-bold text-slate-600 block mb-1">攪拌速度:</label>
+                                <select id="sim-stirB" onchange="updateSim()" class="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white" aria-describedby="sim-stirB-desc">
+                                    <option value="fast">快速攪拌 (120 rpm)</option>
+                                    <option value="medium" selected>中速攪拌 (60 rpm)</option>
+                                    <option value="none">不攪拌 (0 rpm)</option>
+                                </select>
+                                <span id="sim-stirB-desc" class="sr-only">選擇乙杯的攪拌速度</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+                        <span>💡</span>
+                        <span>探究課題：「水溫對食鹽溶解速度的影響」。想探究<b>水溫</b>，水溫就是唯一的獨立變數！</span>
+                    </div>
+                </div>
+
+                <!-- 右側診斷結果卡片 -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base mb-3">實驗診斷報告</h3>
+                        
+                        <!-- 診斷狀態標籤 -->
+                        <div id="sim-status-badge" class="p-4 rounded-xl text-center font-bold text-base mb-4 bg-rose-100 text-rose-800 border border-rose-200">
+                            ❌ 不是公平測試！
+                        </div>
+
+                        <!-- 診斷細節說明 -->
+                        <div id="sim-status-reason" class="text-xs text-slate-600 leading-relaxed space-y-2">
+                            <!-- 理由將由 JS 計算更新 -->
+                        </div>
+                    </div>
+
+                    <!-- 一鍵修正按鈕 -->
+                    <button onclick="fixSimToFair()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition">
+                        ✨ 一鍵修復為「公平測試」
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- 測驗完成模態框 -->
+    <div id="quiz-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeQuizModal()"></div>
+        <div class="relative bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 p-8 text-center transform transition-all scale-95 opacity-0" id="quiz-modal-panel">
+            <div id="quiz-modal-icon" class="text-5xl mb-4">🏆</div>
+            <h2 id="quiz-modal-title" class="text-2xl font-bold text-slate-800 mb-2">測驗完成！</h2>
+            <div class="text-4xl font-extrabold text-emerald-600 mb-2" id="quiz-modal-score">0 / 20</div>
+            <div class="text-sm text-slate-500 mb-4" id="quiz-modal-percent">0%</div>
+            <p id="quiz-modal-msg" class="text-sm text-slate-600 leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl"></p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeQuizModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition">
+                    關閉
+                </button>
+                <button onclick="closeQuizModal(); resetQuiz();" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow transition">
+                    🔄 重新開始
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁腳 -->
+    <footer class="bg-slate-800 text-slate-400 text-xs py-6 border-t border-slate-700 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p class="font-medium text-slate-300">科學探究教學輔助工具 ‧ 公平測試與變數辨異</p>
+            <p>適用於中學科學入門課程 ‧ 設計符合科學探究學習目標 (SPS)</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript 邏輯與 20 題資料庫 -->
+    <script>
+        // =========================================================
+        // 模組化擴充層 1：暗色模式控制 (v2)
+        // =========================================================
+        function applyDarkMode(enabled) {
+            const body = document.body;
+            const btn = document.getElementById('dark-toggle');
+            if (enabled) {
+                body.classList.add('dark');
+                if (btn) btn.textContent = '☀️';
+                document.documentElement.style.colorScheme = 'dark';
+            } else {
+                body.classList.remove('dark');
+                if (btn) btn.textContent = '🌙';
+                document.documentElement.style.colorScheme = 'light';
+            }
+            try { localStorage.setItem('fairtest_darkmode', enabled ? '1' : '0'); }
+            catch (e) { /* ignore */ }
+        }
+
+        function toggleDarkMode() {
+            applyDarkMode(!document.body.classList.contains('dark'));
+        }
+
+        // 初始化：讀取上次的暗色模式偏好
+        (function initDarkMode() {
+            try {
+                const saved = localStorage.getItem('fairtest_darkmode');
+                if (saved === '1') applyDarkMode(true);
+            } catch (e) { /* ignore */ }
+        })();
+
+        // =========================================================
+        // 模組化擴充層 2：模組化 SVG 卡通插畫素材庫 (v2)
+        // 集中管理所有題目的 SVG，避免重複程式碼，方便維護與擴充
+        // =========================================================
+        const ILLUST_MODULES = {
+            // 使用箭頭函式回傳包著 SVG 的字串，讓渲染時才建立
+            thermos: () => `
+                <svg class="w-64 h-36" viewBox="0 0 220 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 蒸氣動畫 -->
+                    <path class="anim-steam" d="M32 6 q2 -4 0 -8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                    <path class="anim-steam" style="animation-delay:.4s" d="M45 10 q2 -4 0 -8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                    <path class="anim-steam" style="animation-delay:.8s" d="M148 6 q2 -4 0 -8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                    <path class="anim-steam" style="animation-delay:.2s" d="M162 10 q2 -4 0 -8" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- 紙杯 (A) -->
+                    <rect class="anim-bob" x="12" y="34" width="56" height="80" rx="6" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                    <path d="M16 40 L20 110 L58 110 L62 40 Z" fill="#fbbf24" opacity="0.4"/>
+                    <!-- 紙杯溫度計 -->
+                    <rect x="42" y="6" width="6" height="100" rx="3" fill="#e2e8f0" stroke="#64748b"/>
+                    <rect x="43.5" y="16" width="3" height="88" fill="#ef4444"/>
+                    <circle cx="45" cy="108" r="7" fill="#ef4444"/>
+                    <!-- 卡通表情 (紙杯) -->
+                    <circle cx="30" cy="66" r="2.2" fill="#78350f"/>
+                    <circle cx="50" cy="66" r="2.2" fill="#78350f"/>
+                    <path d="M34 72 q8 6 16 0" stroke="#78350f" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <text x="28" y="122" font-size="9" font-weight="bold" fill="#78350f">紙杯(70°C)</text>
+                    <!-- 發泡膠杯 (B) -->
+                    <rect class="anim-bob" style="animation-delay:.3s" x="128" y="34" width="56" height="80" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+                    <path d="M132 40 L136 110 L176 110 L180 40 Z" fill="#cbd5e1" opacity="0.4"/>
+                    <!-- 發泡膠杯溫度計 -->
+                    <rect x="158" y="30" width="6" height="100" rx="3" fill="#e2e8f0" stroke="#64748b"/>
+                    <rect x="159.5" y="34" width="3" height="78" fill="#ef4444"/>
+                    <circle cx="161" cy="116" r="7" fill="#ef4444"/>
+                    <!-- 卡通表情 (發泡膠杯) -->
+                    <circle cx="146" cy="66" r="2.2" fill="#334155"/>
+                    <circle cx="166" cy="66" r="2.2" fill="#334155"/>
+                    <path d="M150 72 q8 6 16 0" stroke="#334155" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <text x="144" y="122" font-size="9" font-weight="bold" fill="#334155">發泡膠杯(70°C)</text>
+                </svg>`,
+            papertowel: () => `
+                <svg class="w-64 h-36" viewBox="0 0 220 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 鐵架 -->
+                    <rect x="30" y="110" width="160" height="10" rx="3" fill="#64748b"/>
+                    <rect x="52" y="10" width="9" height="100" fill="#94a3b8"/>
+                    <rect x="52" y="18" width="82" height="7" rx="2" fill="#94a3b8"/>
+                    <!-- 夾子 -->
+                    <rect x="104" y="16" width="22" height="16" rx="2" fill="#334155"/>
+                    <!-- 紙巾條 -->
+                    <rect x="110" y="32" width="9" height="52" fill="#ffffff" stroke="#cbd5e1"/>
+                    <!-- 砝碼懸掛 -->
+                    <line x1="114.5" y1="84" x2="114.5" y2="100" stroke="#94a3b8" stroke-width="2"/>
+                    <circle class="anim-bob" cx="114" cy="106" r="13" fill="#0ea5e9" stroke="#0369a1" stroke-width="2"/>
+                    <text x="100" y="128" font-size="9" font-weight="bold" fill="#0369a1">砝碼加載中</text>
+                    <circle cx="150" cy="30" r="3" fill="#38bdf8"/>
+                    <circle cx="158" cy="44" r="2" fill="#7dd3fc"/>
+                </svg>`,
+            beaker: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M36 16 L36 100 A12 12 0 0 0 48 112 L132 112 A12 12 0 0 0 144 100 L144 16" stroke="#0284c7" stroke-width="3.5" fill="none"/>
+                    <rect x="39" y="58" width="103" height="51" fill="#7dd3fc" opacity="0.55"/>
+                    <circle cx="66" cy="78" r="3" fill="#ffffff" opacity="0.9"/>
+                    <circle cx="80" cy="92" r="2.2" fill="#ffffff" opacity="0.9"/>
+                    <circle cx="100" cy="76" r="2.6" fill="#ffffff" opacity="0.9"/>
+                    <circle cx="74" cy="30" r="2.4" fill="#0369a1"/>
+                    <circle cx="96" cy="30" r="2.4" fill="#0369a1"/>
+                    <path d="M78 36 q7 5 14 0" stroke="#0369a1" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <text x="52" y="8" font-size="9" font-weight="bold" fill="#0369a1">水 + 食鹽</text>
+                </svg>`,
+            plant: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 96 L132 96 L124 54 L58 54 Z" fill="#b45309"/>
+                    <rect x="54" y="46" width="72" height="12" rx="3" fill="#b45309"/>
+                    <line x1="90" y1="54" x2="90" y2="20" stroke="#16a34a" stroke-width="3.5"/>
+                    <path d="M90 40 q-12 0 -12 10 q12 0 12 -10z" fill="#22c55e"/>
+                    <path d="M90 30 q12 0 12 -10 q-12 0 -12 10z" fill="#4ade80"/>
+                    <circle class="anim-bob" cx="90" cy="16" r="9" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+                    <circle cx="86" cy="12" r="3.4" fill="#fff7ed"/>
+                    <circle cx="94" cy="12" r="3.4" fill="#fff7ed"/>
+                    <circle cx="86" cy="20" r="3.4" fill="#fff7ed"/>
+                    <circle cx="94" cy="20" r="3.4" fill="#fff7ed"/>
+                    <circle cx="90" cy="16" r="3" fill="#eab308"/>
+                    <circle cx="150" cy="22" r="9" fill="#fbbf24"/>
+                    <path d="M150 8 v-4 M150 40 v-4 M136 22 h-4 M168 22 h-4 M138 10 l-3 -3 M162 34 l3 3 M162 10 l3 -3 M138 34 l-3 3" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+                    <text x="52" y="126" font-size="9" font-weight="bold" fill="#78350f">植物澆水實驗</text>
+                </svg>`,
+            battery: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="45" y="40" width="80" height="50" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="2.5"/>
+                    <circle cx="65" cy="62" r="13" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                    <circle cx="95" cy="62" r="13" fill="#ef4444" stroke="#b91c1c" stroke-width="1.5"/>
+                    <circle cx="132" cy="42" r="2" fill="#334155"/>
+                    <circle cx="144" cy="42" r="2" fill="#334155"/>
+                    <path d="M134 52 q6 5 12 0" stroke="#334155" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <polygon points="66,74 62,84 68,84 64,94 74,80 66,80 70,74" fill="#facc15"/>
+                    <text x="42" y="28" font-size="10" font-weight="bold" fill="#334155">電池耐用度比較</text>
+                </svg>`,
+            parachute: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="anim-bob" d="M30 30 a60 38 0 0 1 120 0 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+                    <path d="M60 30 a30 38 0 0 1 60 0" fill="#0ea5e9" opacity="0.6"/>
+                    <line x1="90" y1="68" x2="45" y2="34" stroke="#0284c7" stroke-width="1.5"/>
+                    <line x1="90" y1="68" x2="135" y2="34" stroke="#0284c7" stroke-width="1.5"/>
+                    <line x1="90" y1="68" x2="90" y2="34" stroke="#0284c7" stroke-width="1.5"/>
+                    <rect x="80" y="70" width="20" height="16" rx="2" fill="#f1f5f9" stroke="#64748b"/>
+                    <circle cx="90" cy="100" r="6" fill="#94a3b8"/>
+                    <text x="40" y="124" font-size="9" font-weight="bold" fill="#0369a1">降落傘實驗</text>
+                </svg>`,
+            music: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="60" y="30" width="50" height="60" rx="8" fill="#dfe6ef" stroke="#475569" stroke-width="2.5"/>
+                    <circle cx="85" cy="60" r="18" fill="#94a3b8"/>
+                    <circle cx="85" cy="60" r="10" fill="#475569"/>
+                    <text class="anim-bob" x="120" y="44" font-size="20" fill="#8b5cf6">♪</text>
+                    <text class="anim-bob" style="animation-delay:.4s" x="140" y="72" font-size="16" fill="#8b5cf6">♫</text>
+                    <text class="anim-bob" style="animation-delay:.8s" x="112" y="84" font-size="14" fill="#8b5cf6">♪</text>
+                    <text x="52" y="116" font-size="9" font-weight="bold" fill="#6d28d9">音樂類型實驗</text>
+                </svg>`,
+            medical: () => `
+                <svg class="w-60 h-36" viewBox="0 0 180 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="30" y="60" width="40" height="20" rx="10" fill="#fbbf24" stroke="#d97706" stroke-width="2"/>
+                    <rect x="58" y="60" width="24" height="20" rx="10" fill="#f97316" stroke="#c2410c" stroke-width="1"/>
+                    <rect x="130" y="60" width="24" height="20" rx="10" fill="#38bdf8" stroke="#0284c7"/>
+                    <text x="36" y="40" font-size="9" font-weight="bold" fill="#0c4a6e">臨床藥物劑量研究</text>
+                    <path d="M20 90 L70 90 L80 82 L88 100 L98 88 L108 90 L160 90" stroke="#ef4444" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>`,
+            concept: () => `
+                <svg class="w-56 h-36" viewBox="0 0 150 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="44" cy="40" r="26" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="28" y="44" font-size="10" font-weight="bold" fill="#1d4ed8">獨立</text>
+                    <circle cx="108" cy="40" r="26" fill="#fef3c7" stroke="#f59e0b" stroke-width="2.5"/>
+                    <text x="92" y="44" font-size="10" font-weight="bold" fill="#b45309">因變數</text>
+                    <circle cx="76" cy="80" r="26" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+                    <text x="60" y="84" font-size="10" font-weight="bold" fill="#15803d">對照</text>
+                    <line x1="66" y1="50" x2="70" y2="58" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="92" y1="50" x2="88" y2="58" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <text x="40" y="124" font-size="9" font-weight="bold" fill="#475569">變數三兄弟</text>
+                </svg>`
+        };
+
+        // 模組化收斂：renderIllustration 改為查表呼叫
+        // (保留原函式名稱以維持相容，內部改用模組素材庫)
+        function renderIllustration(type) {
+            const container = document.getElementById('question-illustration');
+            if (ILLUST_MODULES[type]) {
+                container.innerHTML = ILLUST_MODULES[type]();
+            } else {
+                container.innerHTML = ILLUST_MODULES.concept();
+            }
+            // 切換題目時加入「跳入」動畫，增加趣味性
+            container.classList.remove('anim-pop');
+            void container.offsetWidth;
+            container.classList.add('anim-pop');
+        }
+
+        // =========================================================
+        // 20 題完整題庫資料庫 (含詳細解析與三大變數拆解)
+        // =========================================================
+        const quizData = [
+            {
+                id: 1,
+                category: "基本概念",
+                question: "在科學探究中，什麼是「獨立變數」（Independent Variable）？",
+                options: [
+                    "A. 實驗中隨之改變並需要測量的結果",
+                    "B. 實驗中唯一由實驗者主動改變的因素",
+                    "C. 在整個實驗過程中必須嚴格保持相同的因素",
+                    "D. 實驗中不需要記錄的任何雜訊因素"
+                ],
+                answer: 1, // Index 1 = B
+                explanation: "「獨立變數」是實驗中唯一由實驗者主動替換或改變的項目（我主動改變的）。在公平測試中，獨立變數只能有 1 個。",
+                iv: "主動改變的單一因素",
+                dv: "隨之變化的測量結果",
+                cv: "所有保持相同的條件",
+                illustration: "concept"
+            },
+            {
+                id: 2,
+                category: "課本情境",
+                question: "小明想比較紙杯和發泡膠杯的保溫能力。他在兩個杯中各倒入 100 cm³ 的 70°C 熱水，20 分鐘後量度水溫。在這個實驗中，「因變數（應變數）」是什麼？",
+                options: [
+                    "A. 杯的種類（紙杯或發泡膠杯）",
+                    "B. 水的體積（100 cm³）",
+                    "C. 開始時的水溫（70°C）",
+                    "D. 20 分鐘後的水溫"
+                ],
+                answer: 3,
+                explanation: "「因變數」是實驗最後量度或記錄的數據（我最後量度的）。本實驗中，20分鐘後量度的水溫是觀察保溫能力的結果數據。",
+                iv: "杯的種類",
+                dv: "20分鐘後的水溫",
+                cv: "初始水溫 (70°C)、水體積 (100 cm³)",
+                illustration: "thermos"
+            },
+            {
+                id: 3,
+                category: "基本概念",
+                question: "要確保一個實驗是「公平測試」（Fair Test），下列哪一項條件是必須滿足的？",
+                options: [
+                    "A. 可以同時改變多個獨立變數以提高效率",
+                    "B. 只能有 1 個獨立變數，其餘變數均為對照變數",
+                    "C. 不需要設置任何對照變數",
+                    "D. 因變數必須在實驗開始前就保持不變"
+                ],
+                answer: 1,
+                explanation: "公平測試的核心精神在於「單一變數控制」：只能改變 1 個獨立變數，其他所有會影響結果的條件都必須固定不變（對照變數）。",
+                iv: "只能有 1 個",
+                dv: "視獨立變數而定",
+                cv: "其餘因素全部鎖定不變",
+                illustration: "balance"
+            },
+            {
+                id: 4,
+                category: "課本情境",
+                question: "卓賢進行紙巾堅韌度測試，他在 A 牌紙巾上掛砝碼，直到紙巾斷裂，並記錄承受的砝碼數量。下列何者是此實驗中的「對照變數」？",
+                options: [
+                    "A. 紙巾的品牌",
+                    "B. 紙巾斷裂前能承受的砝碼數量",
+                    "C. 紙巾的長度與闊度",
+                    "D. 砝碼的顏色"
+                ],
+                answer: 2,
+                explanation: "為了公平比較不同品牌，紙巾的長度、闊度以及掛砝碼的速度等條件必須保持完全相同，這些都是對照變數。",
+                iv: "紙巾的品牌",
+                dv: "承受的砝碼數量",
+                cv: "紙巾長度、闊度、掛載方式",
+                illustration: "papertowel"
+            },
+            {
+                id: 5,
+                category: "實驗診斷",
+                question: "雅文探究「水溫對食鹽溶解速度的影響」。她取了兩燒杯水，甲杯裝 50 mL 的 20°C 冷水，乙杯裝 100 mL 的 80°C 熱水，分別加入 5g 食鹽並攪拌。這個實驗為什麼不是公平測試？",
+                options: [
+                    "A. 食鹽的質量太少",
+                    "B. 同時改變了水溫與水的體積兩個因素",
+                    "C. 沒有記錄食鹽溶解的時間",
+                    "D. 兩杯水的溫度不相同"
+                ],
+                answer: 1,
+                explanation: "該實驗同時改變了「水溫」（20°C vs 80°C）與「水量」（50 mL vs 100 mL），存在兩個改變的因素，因此無法確定食鹽溶解快慢是由水溫還是水量引起的。",
+                iv: "水溫 (被混淆)",
+                dv: "食鹽完全溶解所需時間",
+                cv: "水量 (未被控制！)",
+                illustration: "beaker"
+            },
+            {
+                id: 6,
+                category: "生活應用",
+                question: "小華想研究「土壤類型對植物生長高度的影響」。下列哪一個設定是正確的「獨立變數」？",
+                options: [
+                    "A. 每天給植物澆灌的水量",
+                    "B. 使用的土壤類型（如沙土、黏土、壤土）",
+                    "C. 植物兩週後的生長高度",
+                    "D. 放置植物的地點（陽台或室內）"
+                ],
+                answer: 1,
+                explanation: "小華想探究「土壤類型」，所以主動改變的項目（獨立變數）必須是「土壤類型」。",
+                iv: "土壤類型 (沙土/黏土/壤土)",
+                dv: "植物生長高度",
+                cv: "澆水量、光照、植物種類",
+                illustration: "plant"
+            },
+            {
+                id: 7,
+                category: "生活應用",
+                question: "在探究「光照時間對雞蛋產量影響」的實驗中，農夫將三組母雞分別暴露於每日 8小時、12小時及 16小時的光照下，其餘飼養條件均相同。此實驗的「因變數」應為下列何者？",
+                options: [
+                    "A. 每日光照的時間長短",
+                    "B. 每組母雞每週產下的總蛋數",
+                    "C. 給予母雞的飼料總量",
+                    "D. 雞捨的溫度與濕度"
+                ],
+                answer: 1,
+                explanation: "農夫最後量度與記錄的結果是「每週產下的總蛋數」，這屬於因變數。",
+                iv: "每日光照時間",
+                dv: "每週產下的總蛋數",
+                cv: "飼料量、雞隻品種、環境溫濕度",
+                illustration: "hen"
+            },
+            {
+                id: 8,
+                category: "基本概念",
+                question: "關於「對照變數（Controlled Variable）」的敘述，下列何者完全正確？",
+                options: [
+                    "A. 在整個實驗過程中必須嚴格維持不變",
+                    "B. 是實驗中被測量並記錄結果的項目",
+                    "C. 一個公平測試中只能有 1 個對照變數",
+                    "D. 實驗者會主動去改變它以觀察現象"
+                ],
+                answer: 0,
+                explanation: "對照變數（控制變數）是為了防止干擾實驗結果，在整個實驗過程中必須嚴格保持相同的因素。數量通常可以有多個。",
+                iv: "改變的項目",
+                dv: "測量的項目",
+                cv: "所有嚴格維持不變的項目",
+                illustration: "concept"
+            },
+            {
+                id: 9,
+                category: "實驗診斷",
+                question: "小麗想測試「不同品牌的洗潔精去除油污的能力」。她準備了四塊相同的沾油布料，下列實驗設計何者符合「公平測試」原則？",
+                options: [
+                    "A. 用不同溫度的水洗滌四塊布料",
+                    "B. 使用相同水溫、相同水量與相同洗滌時間洗滌布料",
+                    "C. 給第一塊布料用 10 mL 洗潔精，第二塊用 20 mL",
+                    "D. 四塊布料使用不同的搓洗力道與時間"
+                ],
+                answer: 1,
+                explanation: "要測試「不同品牌洗潔精」（獨立變數），必須確保水溫、水量、洗潔精用量、洗滌時間及搓洗力道等所有其他因素保持完全一致。",
+                iv: "洗潔精品牌",
+                dv: "油污去除殘留量/清潔度",
+                cv: "水溫、水量、洗潔精用量、洗滌時間",
+                illustration: "wash"
+            },
+            {
+                id: 10,
+                category: "實驗診斷",
+                question: "在「探究擺長對擺動週期（來回擺動一次所需時間）影響」的實驗中，下列變數配對何者錯誤？",
+                options: [
+                    "A. 獨立變數 —— 擺線的長度",
+                    "B. 因變數 —— 擺動一次所需的時間",
+                    "C. 對照變數 —— 擺動一次所需的時間",
+                    "D. 對照變數 —— 擺錘的質量與釋放角度"
+                ],
+                answer: 2,
+                explanation: "擺動一次所需的時間是實驗中量度的「因變數」，而不是「對照變數」。選項 C 配對錯誤。",
+                iv: "擺線長度",
+                dv: "擺動週期（時間）",
+                cv: "擺錘質量、釋放角度",
+                illustration: "pendulum"
+            },
+            {
+                id: 11,
+                category: "生活應用",
+                question: "研究員探究「降壓藥物劑量對患者血壓下降幅度的影響」。在這個臨床研究中，患者「血壓下降的幅度」屬於什麼變數？",
+                options: [
+                    "A. 獨立變數",
+                    "B. 因變數（應變數）",
+                    "C. 對照變數",
+                    "D. 干擾變數"
+                ],
+                answer: 1,
+                explanation: "血壓下降幅度是隨著藥物劑量改變而產生的測量結果（我最後量度的），因此是因變數。",
+                iv: "降壓藥物劑量",
+                dv: "血壓下降幅度",
+                cv: "患者年齡範圍、飲食、測量時間",
+                illustration: "medical"
+            },
+            {
+                id: 12,
+                category: "課本情境",
+                question: "小強想比較三個不同品牌電池（X、Y、Z）的耐用度。他將電池分別裝入三個相同型號的手電筒中，持續開啟並記錄手電筒發光的時間。手電筒型號在此實驗中扮演什麼角色？",
+                options: [
+                    "A. 獨立變數",
+                    "B. 因變數",
+                    "C. 對照變數（控制變數）",
+                    "D. 觀察變數"
+                ],
+                answer: 2,
+                explanation: "手電筒型號保持「相同」，以防止不同功率的手電筒影響電池耗電速度，因此屬於對照變數。",
+                iv: "電池品牌 (X, Y, Z)",
+                dv: "手電筒發光持續時間",
+                cv: "手電筒型號、環境溫度",
+                illustration: "battery"
+            },
+            {
+                id: 13,
+                category: "基本概念",
+                question: "設計實驗時，如果沒有適當控制「對照變數」，最可能會造成什麼後果？",
+                options: [
+                    "A. 實驗會耗費過多時間",
+                    "B. 無法確定因變數的變化是由獨立變數還是其他干擾因素引起的",
+                    "C. 獨立變數會自動轉化為因變數",
+                    "D. 實驗數據會變得完全無法測量"
+                ],
+                answer: 1,
+                explanation: "如果對照變數沒有鎖定，當結果發生改變時，你無法判斷這個改變是因為獨立變數引起的，還是因為未被控制的雜訊因素引起的。",
+                iv: "被混淆",
+                dv: "結果失真",
+                cv: "未控制導致實驗無效",
+                illustration: "concept"
+            },
+            {
+                id: 14,
+                category: "實驗診斷",
+                question: "某實驗小組的記錄表欄位如下：「降落傘面積 (cm²)」、「下落高度 (m)」、「下落所需時間 (s)」。若該實驗探究「降落傘面積對下落速度的影響」，請問表中的「下落高度 (m)」應屬於哪種變數？",
+                options: [
+                    "A. 獨立變數",
+                    "B. 因變數",
+                    "C. 對照變數",
+                    "D. 隨機變數"
+                ],
+                answer: 2,
+                explanation: "探究主題是降落傘面積對速度的影響，因此「降落傘面積」是獨立變數，「下落時間」是因變數，而每次測試的「下落高度」必須固定一致，屬於對照變數。",
+                iv: "降落傘面積",
+                dv: "下落所需時間",
+                cv: "下落高度、降落傘材質、重物重量",
+                illustration: "parachute"
+            },
+            {
+                id: 15,
+                category: "生活應用",
+                question: "小英想了解「音樂類型是否會影響人的心跳速率」。她讓受試者在安靜房間內分別聆聽古典樂、搖滾樂與流行樂各 5 分鐘，並測量聽完後每分鐘的心跳次數。在此實驗中，下列何者為「獨立變數」？",
+                options: [
+                    "A. 每分鐘的心跳次數",
+                    "B. 播放的音樂類型",
+                    "C. 聆聽音樂的時間（5分鐘）",
+                    "D. 房間的安靜程度"
+                ],
+                answer: 1,
+                explanation: "小英主動替換不同的音樂類型（古典樂、搖滾樂、流行樂），因此「播放的音樂類型」是獨立變數。",
+                iv: "播放的音樂類型",
+                dv: "每分鐘心跳次數",
+                cv: "聆聽時間 (5分鐘)、安靜環境、受試者姿態",
+                illustration: "music"
+            },
+            {
+                id: 16,
+                category: "實驗診斷",
+                question: "下列哪一個實驗課題的「獨立變數」是金屬的種類？",
+                options: [
+                    "A. 比較同種銅棒在不同溫度下的膨脹程度",
+                    "B. 比較銅棒、鐵棒與鋁棒的傳熱速度",
+                    "C. 比較不同長度的銅棒傳熱快慢",
+                    "D. 探究加熱時間對鐵棒溫度的影響"
+                ],
+                answer: 1,
+                explanation: "選項 B 比較「銅棒、鐵棒與鋁棒」，主動改變的是金屬材質（種類），因此獨立變數是金屬的種類。",
+                iv: "金屬種類 (銅/鐵/鋁)",
+                dv: "傳熱速度 / 溫度升高快慢",
+                cv: "金屬棒長度、粗細、加熱源強度",
+                illustration: "metal"
+            },
+            {
+                id: 17,
+                category: "課本情境",
+                question: "在探究「酵母菌發酵時，糖分濃度對二氧化碳產生速率影響」的實驗中，發酵管頂部收集到的「氣體體積」屬於何種變數？",
+                options: [
+                    "A. 獨立變數",
+                    "B. 因變數（應變數）",
+                    "C. 對照變數",
+                    "D. 常數變數"
+                ],
+                answer: 1,
+                explanation: "產生的氣體體積是量度酵母發酵速率的指標數據（我最後量度的），因此是因變數。",
+                iv: "糖分濃度",
+                dv: "收集到的氣體體積 (CO₂)",
+                cv: "酵母菌用量、水溫、發酵時間",
+                illustration: "beaker"
+            },
+            {
+                id: 18,
+                category: "實驗診斷",
+                question: "小明設計了一個「比較不同材質鞋底摩擦力」的實驗，他拉動鞋子在木板上移動並記錄彈簧秤讀數。下列哪一項不需要被設定為「對照變數」？",
+                options: [
+                    "A. 拉動鞋子時的速度",
+                    "B. 接觸面（木板）的平滑程度",
+                    "C. 測試時鞋底的材質",
+                    "D. 鞋子內放置的重物質量"
+                ],
+                answer: 2,
+                explanation: "本實驗的目的就是比較「不同材質鞋底」，因此「鞋底材質」是主動改變的獨立變數，而不是對照變數！",
+                iv: "鞋底材質",
+                dv: "彈簧秤讀數（摩擦力）",
+                cv: "拉動速度、接觸面木板、鞋內加載重量",
+                illustration: "shoe"
+            },
+            {
+                id: 19,
+                category: "生活應用",
+                question: "科學家在研發新植物肥料時，設定了四組實驗：A組（不施肥）、B組（施肥5g）、C組（施肥10g）、D組（施肥15g）。其中「A組（不施肥）」的主要作用是什麼？",
+                options: [
+                    "A. 作為獨立變數的測試組",
+                    "B. 作為對照組，用以比對有無施肥對植物生長的實際效果",
+                    "C. 節省肥料成本",
+                    "D. 作為因變數的測量標準"
+                ],
+                answer: 1,
+                explanation: "A組不施肥料屬於「對照組 (Control Group)」，用來提供一個基準線，比對施加肥料後是否真的產生明顯效果。",
+                iv: "肥料施加量 (0g, 5g, 10g, 15g)",
+                dv: "植物生長狀況",
+                cv: "土壤、水量、日光",
+                illustration: "plant"
+            },
+            {
+                id: 20,
+                category: "思考邏輯",
+                question: "在判斷一個實驗方案是否為「公平測試」時，下列哪一組思考順序最為清晰合理？",
+                options: [
+                    "A. 先確定因變數（測量什麼） $\\rightarrow$ 再確認獨立變數（改變什麼，是否只有1個） $\\rightarrow$ 檢查對照變數（其他條件是否均保持相同）",
+                    "B. 隨機檢查各變數名稱 $\\rightarrow$ 直接下結論",
+                    "C. 先改變所有條件 $\\rightarrow$ 觀察最後結果是否漂亮",
+                    "D. 只檢查對照變數 $\\rightarrow$ 忽略獨立變數"
+                ],
+                answer: 0,
+                explanation: "清晰的思考順序：1. 確定實驗要量度什麼結果 (因變數) $\\rightarrow$ 2. 檢查主動改變的條件是否唯一 (獨立變數) $\\rightarrow$ 3. 確保其他所有干擾因素均被鎖定 (對照變數)。",
+                iv: "步驟2：確認僅1個",
+                dv: "步驟1：明確目標",
+                cv: "步驟3：全數鎖定",
+                illustration: "concept"
+            }
+        ];
+
+        // 全局狀態
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let score = 0;
+
+        // 初始化頁面
+        window.onload = function() {
+            renderQuestionGrid();
+            loadQuestion(0);
+            updateSim();
+            restoreQuizProgress();
+        };
+
+        // 切換 Tab
+        function switchTab(tab) {
+            // 模組化過渡：加入淡入位移動畫
+            document.getElementById('tab-quiz').classList.add('hidden');
+            document.getElementById('tab-learn').classList.add('hidden');
+            document.getElementById('tab-sim').classList.add('hidden');
+
+            document.getElementById('tab-quiz-btn').className = "px-4 py-1.5 rounded-lg transition-all duration-200 text-white hover:text-emerald-200";
+            document.getElementById('tab-learn-btn').className = "px-4 py-1.5 rounded-lg transition-all duration-200 text-white hover:text-emerald-200";
+            document.getElementById('tab-sim-btn').className = "px-4 py-1.5 rounded-lg transition-all duration-200 text-white hover:text-emerald-200";
+
+            // Reset all tab buttons aria
+            ['quiz','learn','sim'].forEach(t => {
+                const btn = document.getElementById('tab-' + t + '-btn');
+                btn.setAttribute('aria-selected', 'false');
+                btn.setAttribute('tabindex', '-1');
+            });
+            if (tab === 'quiz') {
+                const qp = document.getElementById('tab-quiz');
+                qp.classList.remove('hidden');
+                qp.classList.remove('anim-card'); void qp.offsetWidth; qp.classList.add('anim-card');
+                const btn = document.getElementById('tab-quiz-btn');
+                btn.className = "px-4 py-1.5 rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow-md font-semibold";
+                btn.setAttribute('aria-selected', 'true');
+                btn.setAttribute('tabindex', '0');
+            } else if (tab === 'learn') {
+                const lp = document.getElementById('tab-learn');
+                lp.classList.remove('hidden');
+                lp.classList.remove('anim-card'); void lp.offsetWidth; lp.classList.add('anim-card');
+                const btn = document.getElementById('tab-learn-btn');
+                btn.className = "px-4 py-1.5 rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow-md font-semibold";
+                btn.setAttribute('aria-selected', 'true');
+                btn.setAttribute('tabindex', '0');
+            } else if (tab === 'sim') {
+                const sp = document.getElementById('tab-sim');
+                sp.classList.remove('hidden');
+                sp.classList.remove('anim-card'); void sp.offsetWidth; sp.classList.add('anim-card');
+                const btn = document.getElementById('tab-sim-btn');
+                btn.className = "px-4 py-1.5 rounded-lg transition-all duration-200 bg-white text-emerald-900 shadow-md font-semibold";
+                btn.setAttribute('aria-selected', 'true');
+                btn.setAttribute('tabindex', '0');
+            }
+        }
+
+        // 渲染題目速查網格
+        function renderQuestionGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+            quizData.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.onclick = () => jumpToQuestion(idx);
+                btn.className = getGridBtnClass(idx);
+                btn.innerText = idx + 1;
+                // Accessibility label
+                let status = '未作答';
+                if (userAnswers[idx] !== null) {
+                    status = userAnswers[idx] === quizData[idx].answer ? '已答對' : '答錯';
+                }
+                btn.setAttribute('aria-label', `第 ${idx + 1} 題，${status}`);
+                grid.appendChild(btn);
+            });
+        }
+
+        function getGridBtnClass(idx) {
+            let base = "h-9 rounded-lg font-bold text-xs transition border flex items-center justify-center ";
+            if (idx === currentQuestionIndex) {
+                base += "ring-2 ring-emerald-500 border-emerald-600 bg-emerald-50 text-emerald-800 ";
+            }
+            if (userAnswers[idx] !== null) {
+                if (userAnswers[idx] === quizData[idx].answer) {
+                    base += "bg-emerald-500 text-white border-emerald-600";
+                } else {
+                    base += "bg-rose-500 text-white border-rose-600";
+                }
+            } else {
+                if (idx !== currentQuestionIndex) {
+                    base += "bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200";
+                }
+            }
+            return base;
+        }
+
+        // 載入問題
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = quizData[index];
+
+            // 更新頂部資訊
+            document.getElementById('quiz-progress-text').innerText = `${index + 1}/${quizData.length}`;
+            document.getElementById('quiz-question-title-num').innerText = `第 ${index + 1} 題 / 共 ${quizData.length} 題`;
+            document.getElementById('quiz-category-tag').innerText = q.category;
+            
+            // 進度條
+            const pct = ((index + 1) / quizData.length) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+
+            // 題目內文
+            document.getElementById('question-text').innerText = q.question;
+
+            // 插圖
+            renderIllustration(q.illustration);
+
+            // 選項
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+
+            const isAnswered = userAnswers[index] !== null;
+
+            q.options.forEach((optText, optIdx) => {
+                const optBtn = document.createElement('button');
+                optBtn.onclick = () => selectOption(optIdx);
+                optBtn.setAttribute('role', 'radio');
+                optBtn.setAttribute('aria-checked', 'false');
+                optBtn.setAttribute('tabindex', '0');
+
+                let optStyle = "w-full text-left p-3.5 rounded-xl border transition flex items-center justify-between text-xs sm:text-sm font-medium ";
+
+                if (!isAnswered) {
+                    optStyle += "bg-white border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 text-slate-700";
+                } else {
+                    if (optIdx === q.answer) {
+                        optStyle += "bg-emerald-100 border-emerald-500 text-emerald-900 font-bold shadow-sm";
+                        optBtn.setAttribute('aria-checked', 'true');
+                    } else if (optIdx === userAnswers[index]) {
+                        optStyle += "bg-rose-100 border-rose-400 text-rose-900 font-bold";
+                        optBtn.setAttribute('aria-checked', 'false');
+                    } else {
+                        optStyle += "bg-slate-50 border-slate-200 text-slate-400 opacity-60";
+                        optBtn.setAttribute('aria-checked', 'false');
+                    }
+                }
+
+                optBtn.className = optStyle;
+                optBtn.innerHTML = `
+                    <span>${optText}</span>
+                    ${isAnswered && optIdx === q.answer ? '<span class="text-emerald-600 font-bold" aria-hidden="true">✓ 正確</span>' : ''}
+                    ${isAnswered && optIdx === userAnswers[index] && optIdx !== q.answer ? '<span class="text-rose-600 font-bold" aria-hidden="true">✗ 你的選擇</span>' : ''}
+                `;
+                optContainer.appendChild(optBtn);
+            });
+
+            // 解析卡片
+            const expCard = document.getElementById('explanation-card');
+            if (isAnswered) {
+                expCard.classList.remove('hidden');
+                document.getElementById('explain-text').innerText = q.explanation;
+                document.getElementById('vb-iv').innerText = q.iv;
+                document.getElementById('vb-dv').innerText = q.dv;
+                document.getElementById('vb-cv').innerText = q.cv;
+            } else {
+                expCard.classList.add('hidden');
+            }
+
+            // 按鈕狀態
+            document.getElementById('prev-btn').disabled = index === 0;
+            document.getElementById('next-btn').innerText = index === quizData.length - 1 ? "完成測驗 🎉" : "下一題 →";
+
+            // 更新網格狀態
+            renderQuestionGrid();
+
+            // 無障礙：朗讀當前題目狀態
+            const announce = document.getElementById('sr-announce');
+            if (announce) {
+                const status = userAnswers[index] !== null ? '（已作答）' : '（未作答）';
+                announce.textContent = '第 ' + (index + 1) + ' 題，' + q.category + status;
+            }
+        }
+
+        // 選擇選項
+        function selectOption(optionIndex) {
+            if (userAnswers[currentQuestionIndex] !== null) return; // 已回答過
+
+            userAnswers[currentQuestionIndex] = optionIndex;
+            
+            // 計算總分
+            score = userAnswers.reduce((acc, ans, idx) => {
+                return ans === quizData[idx].answer ? acc + 1 : acc;
+            }, 0);
+
+            document.getElementById('live-score').innerText = score;
+
+            // 重新加載題目以顯示解說
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                showQuizSummary();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function jumpToQuestion(idx) {
+            loadQuestion(idx);
+        }
+
+        function resetQuiz() {
+            userAnswers = new Array(quizData.length).fill(null);
+            score = 0;
+            document.getElementById('live-score').innerText = 0;
+            try {
+                localStorage.removeItem('quiz_progress');
+            } catch (e) { /* ignore */ }
+            loadQuestion(0);
+        }
+
+        function showQuizSummary() {
+            const percentage = Math.round((score / quizData.length) * 100);
+            let icon = "", msg = "";
+            if (percentage === 100) { icon = "🏆"; msg = "完美！你完全掌握了獨立變數、因變數與公平測試的核心原則！"; }
+            else if (percentage >= 80) { icon = "🌟"; msg = "優秀！對於科學探究與變數辨異有非常紮實的概念！"; }
+            else if (percentage >= 60) { icon = "👍"; msg = "良好！建議複習答錯題目的「變數拆解」小卡。"; }
+            else { icon = "💪"; msg = "再接再厲！建議切換至「💡 概念圖解學堂」重新釐清定義。"; }
+
+            document.getElementById('quiz-modal-icon').textContent = icon;
+            document.getElementById('quiz-modal-score').textContent = score + ' / ' + quizData.length;
+            document.getElementById('quiz-modal-percent').textContent = percentage + '%';
+            document.getElementById('quiz-modal-msg').textContent = msg;
+
+            const modal = document.getElementById('quiz-modal');
+            modal.classList.remove('hidden');
+            // Trigger reflow for animation
+            void modal.offsetWidth;
+            modal.classList.add('modal-show');
+
+            // Focus management for accessibility
+            setTimeout(() => {
+                const closeBtn = modal.querySelector('button');
+                if (closeBtn) closeBtn.focus();
+            }, 100);
+        }
+
+        function closeQuizModal() {
+            const modal = document.getElementById('quiz-modal');
+            modal.classList.remove('modal-show');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                // Return focus to the next button
+                document.getElementById('next-btn').focus();
+            }, 200);
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('quiz-modal');
+                if (!modal.classList.contains('hidden')) {
+                    closeQuizModal();
+                }
+            }
+        });
+
+        // 渲染題目插圖 (SVG) — 已由上方模組化 renderIllustration 取代，以下舊版本保留作備註
+        function renderIllustration_legacy(type) {
+            const container = document.getElementById('question-illustration');
+            let svgHtml = "";
+
+            if (type === "thermos") {
+                svgHtml = `
+                <svg class="w-56 h-30" viewBox="0 0 200 120" fill="none">
+                    <rect x="30" y="30" width="50" height="70" rx="4" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                    <rect x="120" y="30" width="50" height="70" rx="4" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
+                    <text x="38" y="112" font-size="10" font-weight="bold" fill="#78350f">紙杯</text>
+                    <text x="122" y="112" font-size="10" font-weight="bold" fill="#334155">發泡膠杯</text>
+                    <line x1="55" y1="10" x2="55" y2="80" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="145" y1="10" x2="145" y2="80" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                </svg>`;
+            } else if (type === "papertowel") {
+                svgHtml = `
+                <svg class="w-56 h-30" viewBox="0 0 200 120" fill="none">
+                    <rect x="90" y="10" width="20" height="10" fill="#334155"/>
+                    <rect x="96" y="20" width="8" height="50" fill="#ffffff" stroke="#cbd5e1"/>
+                    <rect x="90" y="70" width="20" height="10" fill="#334155"/>
+                    <circle cx="100" cy="90" r="10" fill="#0284c7"/>
+                    <text x="115" y="94" font-size="10" font-weight="bold" fill="#0284c7">砝碼</text>
+                </svg>`;
+            } else if (type === "beaker") {
+                svgHtml = `
+                <svg class="w-52 h-30" viewBox="0 0 160 120" fill="none">
+                    <path d="M40 20 L40 100 A10 10 0 0 0 50 110 L110 110 A10 10 0 0 0 120 100 L120 20" stroke="#0284c7" stroke-width="3" fill="none"/>
+                    <rect x="42" y="60" width="76" height="48" fill="#38bdf8" opacity="0.4"/>
+                    <text x="60" y="90" font-size="12" font-weight="bold" fill="#0369a1">水 + 食鹽</text>
+                </svg>`;
+            } else if (type === "plant") {
+                svgHtml = `
+                <svg class="w-52 h-30" viewBox="0 0 160 120" fill="none">
+                    <path d="M50 100 L110 100 L100 60 L60 60 Z" fill="#b45309"/>
+                    <line x1="80" y1="60" x2="80" y2="20" stroke="#16a34a" stroke-width="3"/>
+                    <circle cx="70" cy="30" r="8" fill="#22c55e"/>
+                    <circle cx="90" cy="25" r="10" fill="#22c55e"/>
+                </svg>`;
+            } else {
+                // 通用科學概念圖
+                svgHtml = `
+                <svg class="w-48 h-30" viewBox="0 0 120 100" fill="none">
+                    <circle cx="60" cy="50" r="35" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+                    <path d="M45 50 L55 60 L75 40" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>`;
+            }
+
+            container.innerHTML = svgHtml;
+        }
+
+        // =========================================================
+        // localStorage 進度保存與恢復
+        // =========================================================
+        function saveQuizProgress() {
+            try {
+                const data = {
+                    userAnswers: userAnswers,
+                    score: score,
+                    currentQuestionIndex: currentQuestionIndex,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('quiz_progress', JSON.stringify(data));
+            } catch (e) {
+                console.warn('無法保存進度:', e);
+            }
+        }
+
+        function restoreQuizProgress() {
+            try {
+                const saved = localStorage.getItem('quiz_progress');
+                if (!saved) return;
+                const data = JSON.parse(saved);
+                if (!data || !data.userAnswers) return;
+
+                // 檢查數據有效性
+                if (data.userAnswers.length !== quizData.length) return;
+
+                // 詢問是否恢復（只在有已答題目時）
+                const answeredCount = data.userAnswers.filter(a => a !== null).length;
+                if (answeredCount === 0) return;
+
+                if (confirm('檢測到上次未完成的測驗進度（已答 ' + answeredCount + ' / ' + quizData.length + ' 題）。是否繼續上次進度？')) {
+                    userAnswers = data.userAnswers;
+                    score = data.score || 0;
+                    currentQuestionIndex = data.currentQuestionIndex || 0;
+                    document.getElementById('live-score').innerText = score;
+                    loadQuestion(currentQuestionIndex);
+                }
+            } catch (e) {
+                console.warn('無法恢復進度:', e);
+            }
+        }
+
+        // =========================================================
+        // 公平測試模擬器計算邏輯
+        // =========================================================
+        function updateSim() {
+            const tempA = parseInt(document.getElementById('sim-tempA').value);
+            const volA = parseInt(document.getElementById('sim-volA').value);
+            const stirA = document.getElementById('sim-stirA').value;
+
+            const tempB = parseInt(document.getElementById('sim-tempB').value);
+            const volB = parseInt(document.getElementById('sim-volB').value);
+            const stirB = document.getElementById('sim-stirB').value;
+
+            // UI 數值顯示
+            document.getElementById('sim-tempA-val').innerText = `${tempA}°C`;
+            document.getElementById('sim-volA-val').innerText = `${volA} mL`;
+
+            document.getElementById('sim-tempB-val').innerText = `${tempB}°C`;
+            document.getElementById('sim-volB-val').innerText = `${volB} mL`;
+
+            // 判斷是否公平
+            // 探究目標：水溫對食鹽溶解速度影響
+            // 獨立變數：水溫 (必須不同: tempA != tempB)
+            // 對照變數：水量 (volA == volB) & 攪拌速度 (stirA == stirB)
+
+            const badge = document.getElementById('sim-status-badge');
+            const reason = document.getElementById('sim-status-reason');
+
+            let errors = [];
+
+            if (tempA === tempB) {
+                errors.push("❌ <b>獨立變數缺失</b>：兩杯水溫完全相同（都是 " + tempA + "°C），無法比較不同水溫的效果！");
+            }
+            if (volA !== volB) {
+                errors.push("❌ <b>對照變數未鎖定</b>：甲杯水量 (" + volA + "mL) 與乙杯水量 (" + volB + "mL) 不相同！");
+            }
+            if (stirA !== stirB) {
+                errors.push("❌ <b>對照變數未鎖定</b>：兩杯的攪拌速度不相同！");
+            }
+
+            if (errors.length === 0) {
+                badge.className = "p-4 rounded-xl text-center font-bold text-base mb-4 bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-sm";
+                badge.innerHTML = "✅ 這是一個完美的「公平測試」！";
+
+                reason.innerHTML = `
+                    <div class="p-2.5 bg-emerald-50 rounded-lg text-emerald-900 font-medium">
+                        • <b>獨立變數</b>：水溫（甲杯 ${tempA}°C vs 乙杯 ${tempB}°C，唯一的改變項目）。<br>
+                        • <b>對照變數</b>：水量均為 ${volA} mL、攪拌速度完全相同。<br>
+                        • <b>因變數</b>：食鹽完全溶解所需的時間（秒）。
+                    </div>
+                `;
+            } else {
+                badge.className = "p-4 rounded-xl text-center font-bold text-base mb-4 bg-rose-100 text-rose-800 border border-rose-200 shadow-sm";
+                badge.innerHTML = "❌ 不是公平測試！";
+
+                reason.innerHTML = errors.map(e => `<p class="p-1.5 bg-rose-50 rounded border border-rose-100">${e}</p>`).join('');
+            }
+        }
+
+        function fixSimToFair() {
+            document.getElementById('sim-tempA').value = 20;
+            document.getElementById('sim-tempB').value = 80;
+
+            document.getElementById('sim-volA').value = 100;
+            document.getElementById('sim-volB').value = 100;
+
+            document.getElementById('sim-stirA').value = "medium";
+            document.getElementById('sim-stirB').value = "medium";
+
+            updateSim();
+        }
+    </script>
+</body>
+</html>
