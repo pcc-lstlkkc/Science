@@ -230,7 +230,6 @@ body {
   display: grid;
   gap: 20px;
 }
-.cards--4 { grid-template-columns: repeat(4, 1fr); }
 .cards--2 { grid-template-columns: repeat(2, 1fr); }
 
 .card {
@@ -246,7 +245,6 @@ body {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
 }
-.card__icon { font-size: 2.2rem; margin-bottom: 12px; }
 .card__title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -377,18 +375,16 @@ body {
 
 /* --- Responsive --- */
 @media (max-width: 900px) {
-  .cards--4 { grid-template-columns: repeat(2, 1fr); }
   .awards-grid { grid-template-columns: repeat(2, 1fr); }
   .card--horizontal { grid-template-columns: 1fr; }
   .hero__title { font-size: 2rem; }
   .theme-switcher { top: auto; bottom: 16px; right: 16px; }
 }
 @media (max-width: 600px) {
-  .cards--4, .cards--2, .awards-grid { grid-template-columns: 1fr; }
+  .cards--2, .awards-grid { grid-template-columns: 1fr; }
 
   /* 手機版：卡片緊湊化 */
   .card { padding: 16px 12px; }
-  .card__icon { font-size: 1.6rem; margin-bottom: 6px; }
   .card__title { font-size: 1rem; margin-bottom: 4px; }
 
   /* 手機版：區塊間距縮減 */
