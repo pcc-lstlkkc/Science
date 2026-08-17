@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>光合作用所需的條件</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft JhengHei","PingFang TC",sans-serif;background:#fdf6ee;color:#333;padding:20px;max-width:960px;margin:0 auto}
+h1{text-align:center;color:#e8734a;font-size:1.8em;margin-bottom:8px}
+h2{color:#e8734a;border-bottom:3px solid #e8734a;padding-bottom:6px;margin:30px 0 16px;font-size:1.3em}
+h3{color:#c0592b;margin:16px 0 8px;font-size:1.1em}
+table{width:100%;border-collapse:collapse;margin-bottom:10px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+th{background:#e8734a;color:#fff;padding:12px 10px;text-align:center}
+td{padding:10px;border-bottom:1px solid #f0d9c8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even){background:#fef8f3}
+td:first-child{font-weight:bold}
+select{padding:7px 12px;border:2px solid #ccc;border-radius:6px;font-size:.95em;background:#fff;cursor:pointer;min-width:140px}
+select:focus{border-color:#e8734a;outline:none}
+.ok{border-color:#28a745 !important;background:#d4edda !important}
+.ng{border-color:#dc3545 !important;background:#f8d7da !important}
+.bf{text-align:center;margin:20px 0}
+button{padding:10px 28px;margin:0 8px;border:none;border-radius:8px;font-size:1em;font-weight:bold;cursor:pointer}
+#bC{background:#e8734a;color:#fff}#bS{background:#28a745;color:#fff}#bR{background:#6c757d;color:#fff}
+.sb{text-align:center;font-size:1.1em;margin:10px 0;min-height:1.5em}
+.nt{font-size:.85em;color:#888;margin-top:20px;text-align:center}
+.info{background:#fff3e0;border-left:4px solid #e8734a;padding:12px 16px;margin:10px 0 20px;border-radius:0 8px 8px 0;font-size:.95em;line-height:1.6}
+.sec{background:#fff;border-radius:12px;padding:20px;margin-bottom:30px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+</style>
+</head>
+<body>
+<div style="text-align:left;margin-bottom:10px"><a href="index.html" style="text-decoration:none;color:#e8734a;font-weight:bold;font-size:1.1em">🏠 首頁</a></div>
+<h1>🌱 光合作用所需的條件</h1>
+<div class="info">
+<strong>背景知識：</strong>光合作用需要四個條件——<b>葉綠素</b>、<b>光</b>、<b>二氧化碳</b>和<b>水</b>。<br>
+實驗 7.5 透過三組對照實驗，分別驗證前三個條件。每組實驗只改變一個條件（獨立變數），其餘保持不變（對照變數），並量度澱粉的有無（因變數）來判斷光合作用是否發生。
+</div>
+<h2>🔬 練習一：變數辨識</h2>
+<p style="margin-bottom:16px;color:#666;">以下三組實驗各列出六個候選變數，請判斷每個變數在該實驗中屬於<strong>獨立變數</strong>、<strong>因變數</strong>還是<strong>對照變數</strong>。</p>
+<div class="sec">
+<h3>實驗一：探究葉綠素是否光合作用所需的條件</h3>
+<div class="info" style="margin-top:0"><strong>方法：</strong>取一塊斑葉（同時有綠色和非綠色部分），在強光下照射約四小時後，用碘液測試兩部分是否含有澱粉。</div>
+<table id="p1"><colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+<thead><tr><th>候選變數</th><th>判斷（獨立 / 因 / 對照）</th></tr></thead>
+<tbody>
+<tr><td>葉綠素存在與否</td><td><select onchange="ck1(this)" data-correct="獨立變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>澱粉存在與否</td><td><select onchange="ck1(this)" data-correct="因變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>光照量</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>溫度</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>二氧化碳的供應</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>水的供應</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+</tbody></table></div>
+<div class="sec">
+<h3>實驗二：探究二氧化碳是否光合作用所需的條件</h3>
+<div class="info" style="margin-top:0"><strong>方法：</strong>將兩盆相同的植物分別放進兩個膠袋，一袋放入鹼石灰（吸收二氧化碳），另一袋不放。在強光下照射約四小時後，用碘液測試葉片是否含有澱粉。</div>
+<table id="p2"><colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+<thead><tr><th>候選變數</th><th>判斷（獨立 / 因 / 對照）</th></tr></thead>
+<tbody>
+<tr><td>葉綠素存在與否</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>澱粉存在與否</td><td><select onchange="ck1(this)" data-correct="因變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>光照量</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>溫度</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>二氧化碳的供應</td><td><select onchange="ck1(this)" data-correct="獨立變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>水的供應</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+</tbody></table></div>
+<div class="sec">
+<h3>實驗三：探究光是否光合作用所需的條件</h3>
+<div class="info" style="margin-top:0"><strong>方法：</strong>用黑色卡紙和萬字夾把已脫澱粉植物的葉片部分上下遮蓋，在強光下照射約四小時後，取下卡紙用碘液測試遮光和未遮光部分是否含有澱粉。</div>
+<table id="p3"><colgroup><col style="width:55%"><col style="width:45%"></colgroup>
+<thead><tr><th>候選變數</th><th>判斷（獨立 / 因 / 對照）</th></tr></thead>
+<tbody>
+<tr><td>葉綠素存在與否</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>澱粉存在與否</td><td><select onchange="ck1(this)" data-correct="因變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>光照量</td><td><select onchange="ck1(this)" data-correct="獨立變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>溫度</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>二氧化碳的供應</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+<tr><td>水的供應</td><td><select onchange="ck1(this)" data-correct="對照變數"><option value="">-- 請選擇 --</option><option>獨立變數</option><option>因變數</option><option>對照變數</option></select></td></tr>
+</tbody></table></div>
+<h2>📊 練習二：實驗結果判斷</h2>
+<p style="margin-bottom:16px;color:#666;">三組實驗完成後均以碘液測試葉片。請根據實驗結果，判斷澱粉是否存在，並寫出結論。</p>
+<div class="sec">
+<table id="p4"><colgroup><col style="width:25%"><col style="width:25%"><col style="width:20%"><col style="width:30%"></colgroup>
+<thead><tr><th>實驗組別</th><th>碘液試驗結果</th><th>澱粉是否存在</th><th>結論</th></tr></thead>
+<tbody>
+<tr><td>葉綠素（綠色部分）</td><td><select onchange="ck1(this)" data-correct="變為藍黑色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="葉綠素是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+<tr><td>葉綠素（非綠色部分）</td><td><select onchange="ck1(this)" data-correct="保持棕色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="不存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="葉綠素是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+<tr><td>二氧化碳（無鹼石灰）</td><td><select onchange="ck1(this)" data-correct="變為藍黑色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="二氧化碳是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+<tr><td>二氧化碳（有鹼石灰）</td><td><select onchange="ck1(this)" data-correct="保持棕色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="不存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="二氧化碳是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+<tr><td>光（未遮光）</td><td><select onchange="ck1(this)" data-correct="變為藍黑色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="光是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+<tr><td>光（遮光）</td><td><select onchange="ck1(this)" data-correct="保持棕色"><option value="">-- 請選擇 --</option><option>變為藍黑色</option><option>保持棕色</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="不存在"><option value="">-- 請選擇 --</option><option>存在</option><option>不存在</option></select></td><td><select onchange="ck1(this)" data-correct="光是光合作用所需的條件"><option value="">-- 請選擇 --</option><option>葉綠素是光合作用所需的條件</option><option>二氧化碳是光合作用所需的條件</option><option>光是光合作用所需的條件</option><option>水是光合作用所需的條件</option></select></td></tr>
+</tbody></table></div>
+<div class="bf">
+<button id="bC" onclick="ck()">✅ 檢查答案</button>
+<button id="bS" onclick="sh()">💡 顯示答案</button>
+<button id="bR" onclick="rs()">🔄 重新作答</button>
+</div>
+<div class="sb" id="sb"></div>
+<div class="nt">此頁面僅供學習用途。</div>
+<script>
+var allS=document.querySelectorAll("select");
+function ck1(s){s.classList.remove("ok","ng");if(s.value==="")return;s.classList.add(s.value===s.dataset.correct?"ok":"ng")}
+function ck(){var c=0,t=0,u=0;allS.forEach(function(s){s.classList.remove("ok","ng");t++;if(s.value==="")u++;else if(s.value===s.dataset.correct){s.classList.add("ok");c++}else s.classList.add("ng")});var b=document.getElementById("sb");if(u>0)b.innerHTML="尚有<b>"+u+"</b>題未作答,已作答<b>"+c+"/"+(t-u)+"</b>正確";else b.innerHTML="得分<b>"+c+"</b>/<b>"+t+"</b>"+(c===t?" 🎉 全部正確!":"")}
+function sh(){allS.forEach(function(s){s.classList.remove("ok","ng");for(var i=0;i<s.options.length;i++)if(s.options[i].value===s.dataset.correct){s.selectedIndex=i;break}});document.getElementById("sb").innerHTML="已顯示正確答案"}
+function rs(){allS.forEach(function(s){s.selectedIndex=0;s.classList.remove("ok","ng")});document.getElementById("sb").innerHTML=""}
+</script>
+</body></html>

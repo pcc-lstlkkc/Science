@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>氧氣與二氧化碳的性質比較</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft JhengHei","PingFang TC",sans-serif;background:#fdf6ee;color:#333;padding:20px;max-width:960px;margin:0 auto}
+h1{text-align:center;color:#e8734a;font-size:1.8em;margin-bottom:8px}
+#t1 td:nth-child(2),#t1 td:nth-child(3){text-align:center}
+#t2 td:nth-child(1){text-align:center}
+#t2 td:nth-child(2){text-align:center}
+h2{color:#e8734a;border-bottom:3px solid #e8734a;padding-bottom:6px;margin:30px 0 16px;font-size:1.3em}
+table{width:100%;border-collapse:collapse;margin-bottom:10px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+th{background:#e8734a;color:#fff;padding:12px 10px;text-align:center}
+td{padding:10px;border-bottom:1px solid #f0d9c8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even){background:#fef8f3}
+td:first-child{font-weight:bold}
+select{padding:7px 12px;border:2px solid #ccc;border-radius:6px;font-size:.95em;background:#fff;cursor:pointer;min-width:160px}
+select:focus{border-color:#e8734a;outline:none}
+.ok{border-color:#28a745 !important;background:#d4edda !important}
+.ng{border-color:#dc3545 !important;background:#f8d7da !important}
+.bf{text-align:center;margin:20px 0}
+button{padding:10px 28px;margin:0 8px;border:none;border-radius:8px;font-size:1em;font-weight:bold;cursor:pointer}
+#bC{background:#e8734a;color:#fff}
+#bS{background:#28a745;color:#fff}
+#bR{background:#6c757d;color:#fff}
+.sb{text-align:center;font-size:1.1em;margin:10px 0;min-height:1.5em}
+.nt{font-size:.85em;color:#888;margin-top:20px;text-align:center}
+</style></head><body>
+
+<div style="text-align:left;margin-bottom:10px"><a href="index.html" style="text-decoration:none;color:#e8734a;font-weight:bold;font-size:1.1em">🏠 首頁</a></div>
+<h1>🧪 氧氣與二氧化碳的性質比較</h1>
+<h2>📋 練習一：觀察現象（下拉選單填空）</h2>
+<table id="t1"><colgroup><col style="width:35%"><col style="width:32.5%"><col style="width:32.5%"></colgroup><thead><tr><th>性質</th><th>氧</th><th>二氧化碳</th></tr></thead><tbody>
+<tr><td>它是甚麼顏色的？</td><td><select onchange="ck1(this)" data-correct="無色"><option value="">-- 請選擇 --</option><option>無色</option><option>紅色</option><option>藍色</option></select></td><td><select onchange="ck1(this)" data-correct="無色"><option value="">-- 請選擇 --</option><option>無色</option><option>紅色</option><option>藍色</option></select></td></tr>
+<tr><td>它有甚麼氣味？</td><td><select onchange="ck1(this)" data-correct="無味"><option value="">-- 請選擇 --</option><option>無味</option><option>刺鼻味</option><option>甜味</option></select></td><td><select onchange="ck1(this)" data-correct="無味"><option value="">-- 請選擇 --</option><option>無味</option><option>刺鼻味</option><option>甜味</option></select></td></tr>
+<tr><td>燃燒中的木條有甚麼變化？<br><small>(燃燒加劇 / 火焰熄滅)</small></td><td><select onchange="ck1(this)" data-correct="燃燒加劇"><option value="">-- 請選擇 --</option><option>燃燒加劇</option><option>火焰熄滅</option><option>沒有變化</option></select></td><td><select onchange="ck1(this)" data-correct="火焰熄滅"><option value="">-- 請選擇 --</option><option>燃燒加劇</option><option>火焰熄滅</option><option>沒有變化</option></select></td></tr>
+<tr><td>有餘燼的木條有甚麼變化？<br><small>(重燃 / 餘燼熄滅)</small></td><td><select onchange="ck1(this)" data-correct="重燃"><option value="">-- 請選擇 --</option><option>重燃</option><option>餘燼熄滅</option><option>沒有變化</option></select></td><td><select onchange="ck1(this)" data-correct="餘燼熄滅"><option value="">-- 請選擇 --</option><option>重燃</option><option>餘燼熄滅</option><option>沒有變化</option></select></td></tr>
+<tr><td>碳酸氫鹽指示劑有甚麼變化？<br><small>(寫出顏色的變化)</small></td><td><select onchange="ck1(this)" data-correct="沒有顏色變化"><option value="">-- 請選擇 --</option><option>沒有顏色變化</option><option>由紅色變為黃色</option><option>變為粉紅色</option></select></td><td><select onchange="ck1(this)" data-correct="由紅色變為黃色"><option value="">-- 請選擇 --</option><option>沒有顏色變化</option><option>由紅色變為黃色</option><option>變為粉紅色</option></select></td></tr>
+<tr><td>石灰水有甚麼變化？<br><small>(寫出顏色的變化)</small></td><td><select onchange="ck1(this)" data-correct="沒有顏色變化"><option value="">-- 請選擇 --</option><option>沒有顏色變化</option><option>變為乳濁</option><option>變為紅色</option></select></td><td><select onchange="ck1(this)" data-correct="變為乳濁"><option value="">-- 請選擇 --</option><option>沒有顏色變化</option><option>變為乳濁</option><option>變為紅色</option></select></td></tr>
+</tbody></table>
+<h2>🔬 練習二：鑑別方法（右欄觀察現象，左欄選方法）</h2>
+<table id="t2"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead><tr><th>觀察到的現象</th><th>使用的測試方法</th></tr></thead><tbody>
+<tr><td>燃燒加劇</td><td><select onchange="ck1(this)" data-correct="燃燒中的木條"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+<tr><td>重燃</td><td><select onchange="ck1(this)" data-correct="有餘燼的木條"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+<tr><td>由紅色變為黃色</td><td><select onchange="ck1(this)" data-correct="碳酸氫鹽指示劑"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+<tr><td>變為乳濁</td><td><select onchange="ck1(this)" data-correct="石灰水"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+<tr><td>火焰熄滅</td><td><select onchange="ck1(this)" data-correct="燃燒中的木條"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+<tr><td>餘燼熄滅</td><td><select onchange="ck1(this)" data-correct="有餘燼的木條"><option value="">-- 請選擇 --</option><option>燃燒中的木條</option><option>有餘燼的木條</option><option>碳酸氫鹽指示劑</option><option>石灰水</option></select></td></tr>
+</tbody></table>
+<div class="bf">
+<button id="bC" onclick="ck()">✅ 檢查答案</button>
+<button id="bS" onclick="sh()">💡 顯示答案</button>
+<button id="bR" onclick="rs()">🔄 重新作答</button>
+</div>
+<div class="sb" id="sb"></div>
+<div class="nt">此頁面僅供學習用途。</div>
+<script>
+var allS=document.querySelectorAll("select");
+function ck1(s){
+s.classList.remove("ok","ng");
+if(s.value==="")return;
+if(s.value===s.dataset.correct){s.classList.add("ok")}
+else{s.classList.add("ng")}
+}
+function ck(){
+var c=0,t=0,u=0;
+allS.forEach(function(s){
+s.classList.remove("ok","ng");
+t++;
+if(s.value===""){u++}
+else if(s.value===s.dataset.correct){s.classList.add("ok");c++}
+else{s.classList.add("ng")}
+});
+var b=document.getElementById("sb");
+if(u>0){b.innerHTML="尚有<b>"+u+"</b>題未作答,已作答<b>"+c+"/"+(t-u)+"</b>正確"}
+else{b.innerHTML="得分<b>"+c+"</b>/<b>"+t+"</b>"+(c===t?" 全部正確!":"")}
+}
+function sh(){
+allS.forEach(function(s){
+s.classList.remove("ok","ng");
+for(var i=0;i<s.options.length;i++){
+if(s.options[i].value===s.dataset.correct){s.selectedIndex=i;break}
+}
+});
+document.getElementById("sb").innerHTML="已顯示正確答案"
+}
+function rs(){
+allS.forEach(function(s){s.selectedIndex=0;s.classList.remove("ok","ng")});
+document.getElementById("sb").innerHTML=""
+}
+</script></body></html>
