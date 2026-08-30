@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科學探究大挑戰 - 雙路徑流程圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f4f8;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .drop-zone {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px dashed #cbd5e1;
+            min-height: 68px;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: scale(1.03);
+        }
+
+        .drop-zone.filled {
+            border-style: solid;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        .draggable-card {
+            cursor: grab;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .draggable-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .draggable-card:active {
+            cursor: grabbing;
+        }
+
+        .draggable-card.selected-card {
+            outline: 3px solid #f59e0b;
+            transform: scale(1.05);
+            background-color: #fffbeb;
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Custom Scrollbar for canvas overflow */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
+
+<div class="w-full max-w-5xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden flex flex-col">
+    
+    <!-- Top Bar: Header & Countdown Timer (No Score Display) -->
+    <header class="bg-slate-800 text-white p-4 sm:p-5 flex flex-wrap justify-between items-center gap-3">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <span>🔬</span> 科學探究大挑戰
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">雙路徑流程圖：限時 30 秒大闖關</p>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Countdown Timer Display -->
+            <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-2.5">
+                <span class="text-xl">⏱️</span>
+                <div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">剩餘時間</div>
+                    <div id="timer-display" class="text-xl font-black text-amber-400 font-mono">30.0s</div>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5">
+                <span>🔄</span> 重來
+            </button>
+
+            <a href="index.html" class="bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3.5 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5" title="返回首頁" aria-label="返回首頁">
+                <span>🏠</span> 返回首頁
+            </a>
+        </div>
+    </header>
+
+    <main class="p-4 sm:p-6 flex-1 flex flex-col gap-5" id="game-playground">
+        
+        <!-- Scenario Description Card -->
+        <section class="bg-indigo-50/80 border-l-4 border-indigo-500 p-3.5 sm:p-4 rounded-r-xl text-slate-700 shadow-sm">
+            <h2 class="font-bold text-indigo-900 flex items-center gap-2 text-sm sm:text-base">
+                <span>📌</span> 探究任務：植物向光性實驗
+            </h2>
+            <p class="text-xs sm:text-sm mt-1 leading-relaxed text-slate-600">
+                請在 <strong class="text-red-600 font-bold">30 秒內</strong> 將正確卡片依序排列於上方 5 個主軸步驟，並完成下方「支持」與「不支持」假說的雙路徑決策！
+            </p>
+        </section>
+
+        <section class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-inner">
+            <div class="custom-scrollbar overflow-x-auto pb-2">
+                <div class="min-w-[850px] flex flex-col gap-5">
+                    
+                    <!-- Main Trunk: 5 Steps smoothly aligned on a single horizontal line -->
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            主軸探究步驟 (順暢 5 步驟水平鏈)
+                        </div>
+                        
+                        <!-- 5 Horizontal Steps Row with Arrow Dividers -->
+                        <div class="flex items-center justify-between gap-1.5">
+                            
+                            <!-- Step 1 -->
+                            <div class="flex-1 flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-slate-500 text-center">步驟 1</span>
+                                <div class="drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-slate-200"
+                                     data-step="1">
+                                    拖拽至此
+                                </div>
+                            </div>
+
+                            <span class="text-slate-300 font-black text-base px-0.5">➔</span>
+
+                            <!-- Step 2 -->
+                            <div class="flex-1 flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-slate-500 text-center">步驟 2</span>
+                                <div class="drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-slate-200"
+                                     data-step="2">
+                                    拖拽至此
+                                </div>
+                            </div>
+
+                            <span class="text-slate-300 font-black text-base px-0.5">➔</span>
+
+                            <!-- Step 3 -->
+                            <div class="flex-1 flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-slate-500 text-center">步驟 3</span>
+                                <div class="drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-slate-200"
+                                     data-step="3">
+                                    拖拽至此
+                                </div>
+                            </div>
+
+                            <span class="text-slate-300 font-black text-base px-0.5">➔</span>
+
+                            <!-- Step 4 -->
+                            <div class="flex-1 flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-slate-500 text-center">步驟 4</span>
+                                <div class="drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-slate-200"
+                                     data-step="4">
+                                    拖拽至此
+                                </div>
+                            </div>
+
+                            <span class="text-slate-300 font-black text-base px-0.5">➔</span>
+
+                            <!-- Step 5 -->
+                            <div class="flex-1 flex flex-col gap-1">
+                                <span class="text-[11px] font-bold text-slate-500 text-center">步驟 5</span>
+                                <div class="drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-slate-200"
+                                     data-step="5">
+                                    拖拽至此
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="relative border-t border-slate-200 my-0.5">
+                        <span class="absolute left-1/2 -top-3 -translate-x-1/2 bg-slate-100 px-3.5 py-0.5 text-[11px] font-bold text-slate-500 rounded-full border border-slate-200 shadow-sm flex items-center gap-1">
+                            🔀 步驟 5 後的雙路徑延伸決策
+                        </span>
+                    </div>
+
+                    <!-- Dual Branch Rows -->
+                    <div class="grid grid-cols-2 gap-4">
+                        
+                        <!-- Branch A: Supports Hypothesis -->
+                        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 flex flex-col gap-2.5">
+                            <div class="flex items-center gap-1.5 text-emerald-800 font-bold text-xs">
+                                <span class="bg-emerald-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">✓</span>
+                                分支 A：實驗結果【支持】假說
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400 text-base font-bold">➔</span>
+                                <div class="drop-zone flex-1 rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-emerald-300"
+                                     data-step="6A">
+                                    選擇合適卡片
+                                </div>
+                                <span class="text-slate-400 text-base font-bold">➔</span>
+                                <div class="bg-emerald-100 text-emerald-800 text-[11px] font-bold p-2 rounded-xl text-center w-28 shadow-sm">
+                                    成為被接受的科學知識
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Branch B: Does NOT Support Hypothesis -->
+                        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex flex-col gap-2.5">
+                            <div class="flex items-center gap-1.5 text-amber-800 font-bold text-xs">
+                                <span class="bg-amber-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">✗</span>
+                                分支 B：實驗結果【不支持】假說
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400 text-base font-bold">➔</span>
+                                <div class="drop-zone flex-1 rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 border-amber-300"
+                                     data-step="6B">
+                                    選擇合適卡片
+                                </div>
+                                <span class="text-slate-400 text-base font-bold">➔</span>
+                                <div class="bg-amber-100 text-amber-800 text-[11px] font-bold p-2 rounded-xl text-center w-28 shadow-sm">
+                                    返回「提出假設」重新實驗
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-2">
+            <div class="flex justify-between items-center px-1">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    📦 請將下方卡片放置於對應位置：
+                </span>
+                <span class="text-xs text-amber-600 font-medium hidden sm:inline">
+                    💡 提示：按壓卡片後再按目標框亦可完成放置
+                </span>
+            </div>
+
+            <div class="bg-slate-100 border border-slate-200 rounded-2xl p-3 min-h-[85px] flex flex-wrap gap-2.5 items-center justify-center" id="cards-pool">
+                <!-- Dynamic cards populated here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Success Modal -->
+    <div id="modal-success" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl border border-emerald-100 flex flex-col items-center gap-5">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-sm">
+                🎉
+            </div>
+            <div>
+                <h3 class="text-2xl font-black text-slate-800">挑戰成功！</h3>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1.5">你已精準掌握科學探究的 5 大主軸步驟與雙路徑邏輯！</p>
+            </div>
+
+            <!-- Stats Display (No Score) -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 w-full grid grid-cols-2 gap-3 my-1">
+                <div class="border-r border-slate-200 pr-2">
+                    <div class="text-xs text-slate-400 font-semibold mb-1">⏱️ 總耗時</div>
+                    <div id="stat-time-used" class="text-xl sm:text-2xl font-black text-indigo-600 font-mono">0.0s</div>
+                </div>
+                <div class="pl-2">
+                    <div class="text-xs text-slate-400 font-semibold mb-1">⌛ 剩餘時間</div>
+                    <div id="stat-time-left" class="text-xl sm:text-2xl font-black text-emerald-600 font-mono">0.0s</div>
+                </div>
+            </div>
+
+            <button onclick="resetGame()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition">
+                再次挑戰 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Failed Modal -->
+    <div id="modal-failed" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center shadow-2xl border border-red-100 flex flex-col items-center gap-5">
+            <div class="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-3xl font-bold shadow-sm">
+                ⏰
+            </div>
+            <div>
+                <h3 class="text-2xl font-black text-slate-800">挑戰失敗！</h3>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1.5">30 秒時間已耗盡！請提升速度再次嘗試。</p>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs text-left w-full leading-relaxed">
+                💡 <strong>探究提示：</strong>順序為：觀察 ➔ 提出假設 ➔ 設計實驗 ➔ 分析數據 ➔ 作出結論；支持則發表成果，不支持則修正假說。
+            </div>
+
+            <button onclick="resetGame()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition">
+                重新嘗試 🔄
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Game Cards Definition: 5 Main Steps + 2 Branch Options + Distractors
+    const cardDefinitions = [
+        { id: 'c1', step: '1', name: '觀察現象', color: 'bg-blue-500 text-white' },
+        { id: 'c2', step: '2', name: '提出假設', color: 'bg-teal-500 text-white' },
+        { id: 'c3', step: '3', name: '設計與進行實驗', color: 'bg-indigo-500 text-white' },
+        { id: 'c4', step: '4', name: '分析數據', color: 'bg-purple-500 text-white' },
+        { id: 'c5', step: '5', name: '作出結論', color: 'bg-pink-600 text-white' },
+        { id: 'c6a', step: '6A', name: '發表實驗成果', color: 'bg-emerald-600 text-white' },
+        { id: 'c6b', step: '6B', name: '修正假說與檢討', color: 'bg-amber-600 text-white' },
+        // Distractors
+        { id: 'd1', step: 'wrong', name: '修改數據符合預期', color: 'bg-rose-500 text-white' },
+        { id: 'd2', step: 'wrong', name: '直接放棄探究', color: 'bg-slate-600 text-white' }
+    ];
+
+    // State Variables
+    const TOTAL_TIME = 30.0;
+    let timeRemaining = TOTAL_TIME;
+    let timerId = null;
+    let isGameActive = false;
+    let filledZonesCount = 0;
+    let selectedCardElement = null;
+
+    // DOM Elements
+    const timerDisplay = document.getElementById('timer-display');
+    const cardsPool = document.getElementById('cards-pool');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const modalSuccess = document.getElementById('modal-success');
+    const modalFailed = document.getElementById('modal-failed');
+
+    function initGame() {
+        clearInterval(timerId);
+        timeRemaining = TOTAL_TIME;
+        filledZonesCount = 0;
+        isGameActive = true;
+        selectedCardElement = null;
+
+        timerDisplay.innerText = `${TOTAL_TIME.toFixed(1)}s`;
+        timerDisplay.className = 'text-xl font-black text-amber-400 font-mono';
+
+        modalSuccess.classList.add('hidden');
+        modalFailed.classList.add('hidden');
+
+        resetDropZones();
+        renderCards();
+        startTimer();
+    }
+
+    // Start Timer (100ms interval)
+    function startTimer() {
+        const startTime = Date.now();
+        timerId = setInterval(() => {
+            if (!isGameActive) return;
+
+            const elapsed = (Date.now() - startTime) / 1000;
+            timeRemaining = Math.max(0, TOTAL_TIME - elapsed);
+            
+            timerDisplay.innerText = `${timeRemaining.toFixed(1)}s`;
+
+            if (timeRemaining <= 5.0) {
+                timerDisplay.className = 'text-xl font-black text-red-500 font-mono animate-pulse';
+            }
+
+            if (timeRemaining <= 0) {
+                endGame(false);
+            }
+        }, 100);
+    }
+
+    function resetDropZones() {
+        dropZones.forEach(zone => {
+            const step = zone.dataset.step;
+            zone.innerText = step.includes('6') ? '選擇合適卡片' : '拖拽至此';
+            zone.className = `drop-zone rounded-xl bg-white flex items-center justify-center text-center p-2 text-xs font-bold text-slate-400 ${
+                step === '6A' ? 'border-emerald-300' : step === '6B' ? 'border-amber-300' : 'border-slate-300'
+            }`;
+            
+            zone.addEventListener('dragover', handleDragOver);
+            zone.addEventListener('dragleave', handleDragLeave);
+            zone.addEventListener('drop', handleDrop);
+            zone.addEventListener('click', handleZoneClick);
+        });
+    }
+
+    function renderCards() {
+        cardsPool.innerHTML = '';
+        const shuffled = [...cardDefinitions].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(card => {
+            const cardEl = document.createElement('div');
+            cardEl.className = `draggable-card px-3 py-2 rounded-xl font-bold text-xs sm:text-sm shadow-sm select-none ${card.color}`;
+            cardEl.draggable = true;
+            cardEl.id = card.id;
+            cardEl.dataset.step = card.step;
+            cardEl.innerText = card.name;
+
+            // Events
+            cardEl.addEventListener('dragstart', handleDragStart);
+            cardEl.addEventListener('click', handleCardClick);
+
+            cardsPool.appendChild(cardEl);
+        });
+    }
+
+    function handleDragStart(e) {
+        if (!isGameActive) return;
+        e.dataTransfer.setData('text/plain', e.target.id);
+        clearSelectedCard();
+    }
+
+    function handleDragOver(e) {
+        if (!isGameActive) return;
+        e.preventDefault();
+        e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        if (!isGameActive) return;
+        e.preventDefault();
+        const zone = e.currentTarget;
+        zone.classList.remove('drag-over');
+
+        const cardId = e.dataTransfer.getData('text/plain');
+        const cardEl = document.getElementById(cardId);
+        
+        if (cardEl) {
+            processPlacement(cardEl, zone);
+        }
+    }
+
+    function handleCardClick(e) {
+        if (!isGameActive) return;
+        const clickedCard = e.currentTarget;
+
+        if (selectedCardElement === clickedCard) {
+            clearSelectedCard();
+        } else {
+            clearSelectedCard();
+            selectedCardElement = clickedCard;
+            selectedCardElement.classList.add('selected-card');
+        }
+    }
+
+    function handleZoneClick(e) {
+        if (!isGameActive || !selectedCardElement) return;
+        const zone = e.currentTarget;
+        processPlacement(selectedCardElement, zone);
+        clearSelectedCard();
+    }
+
+    function clearSelectedCard() {
+        if (selectedCardElement) {
+            selectedCardElement.classList.remove('selected-card');
+            selectedCardElement = null;
+        }
+    }
+
+    function processPlacement(cardEl, zone) {
+        const cardStep = cardEl.dataset.step;
+        const zoneStep = zone.dataset.step;
+
+        if (cardStep === zoneStep) {
+            // Correct Placement
+            zone.innerText = cardEl.innerText;
+            zone.className = `drop-zone filled rounded-xl ${cardEl.className.replace('draggable-card', '')} flex items-center justify-center text-center p-2 text-xs font-bold shadow-md`;
+            
+            cardEl.remove();
+            filledZonesCount++;
+
+            // Total 7 drop zones required: Steps 1, 2, 3, 4, 5 + Branches 6A, 6B
+            if (filledZonesCount === 7) {
+                endGame(true);
+            }
+        } else {
+            // Wrong Placement
+            zone.classList.add('shake');
+            setTimeout(() => zone.classList.remove('shake'), 400);
+        }
+    }
+
+    function endGame(isSuccess) {
+        isGameActive = false;
+        clearInterval(timerId);
+
+        if (isSuccess) {
+            const timeUsed = (TOTAL_TIME - timeRemaining).toFixed(1);
+            document.getElementById('stat-time-used').innerText = `${timeUsed}s`;
+            document.getElementById('stat-time-left').innerText = `${timeRemaining.toFixed(1)}s`;
+            modalSuccess.classList.remove('hidden');
+        } else {
+            modalFailed.classList.remove('hidden');
+        }
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    window.onload = initGame;
+</script>
+</body>
+</html>
