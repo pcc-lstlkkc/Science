@@ -35,7 +35,7 @@
         .draggable-card {
             cursor: grab;
             transition: all 0.2s ease;
-            touch-action: manipulation;
+            touch-action: none;
         }
 
         .draggable-card:hover {
@@ -87,7 +87,7 @@
             <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
                 <span>🔬</span> 科學探究大挑戰
             </h1>
-            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">雙路徑流程圖：限時 30 秒大闖關</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">雙路徑流程圖：限時 120 秒大闖關</p>
         </div>
 
         <div class="flex items-center gap-4">
@@ -96,7 +96,7 @@
                 <span class="text-xl">⏱️</span>
                 <div>
                     <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">剩餘時間</div>
-                    <div id="timer-display" class="text-xl font-black text-amber-400 font-mono">30.0s</div>
+                    <div id="timer-display" class="text-xl font-black text-amber-400 font-mono">120.0s</div>
                 </div>
             </div>
 
@@ -118,7 +118,7 @@
                 <span>📌</span> 探究任務：植物向光性實驗
             </h2>
             <p class="text-xs sm:text-sm mt-1 leading-relaxed text-slate-600">
-                請在 <strong class="text-red-600 font-bold">30 秒內</strong> 將正確卡片依序排列於上方 5 個主軸步驟，並完成下方「支持」與「不支持」假說的雙路徑決策！
+                請在 <strong class="text-red-600 font-bold">120 秒內</strong> 將正確卡片依序排列於上方 5 個主軸步驟，並完成下方「支持」與「不支持」假說的雙路徑決策！
             </p>
         </section>
 
@@ -299,7 +299,7 @@
             </div>
             <div>
                 <h3 class="text-2xl font-black text-slate-800">挑戰失敗！</h3>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1.5">30 秒時間已耗盡！請提升速度再次嘗試。</p>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1.5">120 秒時間已耗盡！請提升速度再次嘗試。</p>
             </div>
 
             <div class="bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-xl text-xs text-left w-full leading-relaxed">
@@ -330,7 +330,7 @@
     ];
 
     // State Variables
-    const TOTAL_TIME = 30.0;
+    const TOTAL_TIME = 120.0;
     let timeRemaining = TOTAL_TIME;
     let timerId = null;
     let isGameActive = false;
@@ -394,7 +394,7 @@
             zone.addEventListener('dragover', handleDragOver);
             zone.addEventListener('dragleave', handleDragLeave);
             zone.addEventListener('drop', handleDrop);
-            zone.addEventListener('click', handleZoneClick);
+            zone.addEventListener('pointerdown', handleZonePointerDown);
         });
     }
 
@@ -402,17 +402,22 @@
         cardsPool.innerHTML = '';
         const shuffled = [...cardDefinitions].sort(() => Math.random() - 0.5);
 
+        // Detect touch-only devices (no fine pointer = no mouse)
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
         shuffled.forEach(card => {
             const cardEl = document.createElement('div');
             cardEl.className = `draggable-card px-3 py-2 rounded-xl font-bold text-xs sm:text-sm shadow-sm select-none ${card.color}`;
-            cardEl.draggable = true;
+            cardEl.draggable = !isTouchDevice; // Only enable HTML5 drag on desktop
             cardEl.id = card.id;
             cardEl.dataset.step = card.step;
             cardEl.innerText = card.name;
 
-            // Events
-            cardEl.addEventListener('dragstart', handleDragStart);
-            cardEl.addEventListener('click', handleCardClick);
+            // Events — use pointerdown for instant response on mobile
+            if (!isTouchDevice) {
+                cardEl.addEventListener('dragstart', handleDragStart);
+            }
+            cardEl.addEventListener('pointerdown', handleCardPointerDown);
 
             cardsPool.appendChild(cardEl);
         });
@@ -448,8 +453,10 @@
         }
     }
 
-    function handleCardClick(e) {
+    function handleCardPointerDown(e) {
         if (!isGameActive) return;
+        // Only prevent default on touch to avoid breaking desktop drag-and-drop
+        if (e.pointerType === 'touch') e.preventDefault();
         const clickedCard = e.currentTarget;
 
         if (selectedCardElement === clickedCard) {
@@ -461,8 +468,9 @@
         }
     }
 
-    function handleZoneClick(e) {
+    function handleZonePointerDown(e) {
         if (!isGameActive || !selectedCardElement) return;
+        if (e.pointerType === 'touch') e.preventDefault();
         const zone = e.currentTarget;
         processPlacement(selectedCardElement, zone);
         clearSelectedCard();
