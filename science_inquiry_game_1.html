@@ -35,7 +35,7 @@
         .draggable-card {
             cursor: grab;
             transition: all 0.2s ease;
-            touch-action: manipulation;
+            touch-action: none;
         }
 
         .draggable-card:hover {
@@ -402,16 +402,21 @@
         cardsPool.innerHTML = '';
         const shuffled = [...cardDefinitions].sort(() => Math.random() - 0.5);
 
+        // Detect touch-only devices (no fine pointer = no mouse)
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
         shuffled.forEach(card => {
             const cardEl = document.createElement('div');
             cardEl.className = `draggable-card px-3 py-2 rounded-xl font-bold text-xs sm:text-sm shadow-sm select-none ${card.color}`;
-            cardEl.draggable = true;
+            cardEl.draggable = !isTouchDevice; // Only enable HTML5 drag on desktop
             cardEl.id = card.id;
             cardEl.dataset.step = card.step;
             cardEl.innerText = card.name;
 
             // Events — use pointerdown for instant response on mobile
-            cardEl.addEventListener('dragstart', handleDragStart);
+            if (!isTouchDevice) {
+                cardEl.addEventListener('dragstart', handleDragStart);
+            }
             cardEl.addEventListener('pointerdown', handleCardPointerDown);
 
             cardsPool.appendChild(cardEl);
