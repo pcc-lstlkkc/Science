@@ -51,6 +51,18 @@
             outline: 3px solid #f59e0b;
             transform: scale(1.05);
             background-color: #fffbeb;
+            animation: selectPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes selectPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+
+        #mobile-instruction {
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 50;
         }
 
         .shake {
@@ -109,6 +121,11 @@
             </a>
         </div>
     </header>
+
+    <!-- Mobile instruction banner (hidden by default, shown when a card is selected) -->
+    <div id="mobile-instruction" class="hidden bg-amber-500 text-white text-center py-2.5 px-4 text-sm font-bold shadow-md">
+        👆 已選取卡片！請點擊上方流程圖的空格放入
+    </div>
 
     <main class="p-4 sm:p-6 flex-1 flex flex-col gap-5" id="game-playground">
         
@@ -343,6 +360,7 @@
     const dropZones = document.querySelectorAll('.drop-zone');
     const modalSuccess = document.getElementById('modal-success');
     const modalFailed = document.getElementById('modal-failed');
+    const mobileInstruction = document.getElementById('mobile-instruction');
 
     function initGame() {
         clearInterval(timerId);
@@ -356,6 +374,7 @@
 
         modalSuccess.classList.add('hidden');
         modalFailed.classList.add('hidden');
+        mobileInstruction.classList.add('hidden');
 
         resetDropZones();
         renderCards();
@@ -391,10 +410,21 @@
                 step === '6A' ? 'border-emerald-300' : step === '6B' ? 'border-amber-300' : 'border-slate-300'
             }`;
             
+            // Remove old listeners first to prevent duplicates on reset
+            zone.removeEventListener('dragover', handleDragOver);
+            zone.removeEventListener('dragleave', handleDragLeave);
+            zone.removeEventListener('drop', handleDrop);
+            zone.removeEventListener('pointerdown', handleZonePointerDown);
+            zone.removeEventListener('touchstart', handleZoneTouch);
+
+            // Desktop: HTML5 drag-and-drop
             zone.addEventListener('dragover', handleDragOver);
             zone.addEventListener('dragleave', handleDragLeave);
             zone.addEventListener('drop', handleDrop);
+            // Both: pointer events (desktop mouse + mobile tap fallback)
             zone.addEventListener('pointerdown', handleZonePointerDown);
+            // Mobile: touchstart for reliable touch inside scroll containers
+            zone.addEventListener('touchstart', handleZoneTouch, { passive: false });
         });
     }
 
@@ -413,11 +443,14 @@
             cardEl.dataset.step = card.step;
             cardEl.innerText = card.name;
 
-            // Events — use pointerdown for instant response on mobile
+            // Desktop: HTML5 drag start
             if (!isTouchDevice) {
                 cardEl.addEventListener('dragstart', handleDragStart);
             }
+            // Both: pointer events
             cardEl.addEventListener('pointerdown', handleCardPointerDown);
+            // Mobile: touchstart for reliable touch in scroll containers
+            cardEl.addEventListener('touchstart', handleCardTouch, { passive: false });
 
             cardsPool.appendChild(cardEl);
         });
@@ -465,6 +498,8 @@
             clearSelectedCard();
             selectedCardElement = clickedCard;
             selectedCardElement.classList.add('selected-card');
+            // Show instruction banner for mobile users
+            if (mobileInstruction) mobileInstruction.classList.remove('hidden');
         }
     }
 
@@ -476,11 +511,41 @@
         clearSelectedCard();
     }
 
+    // === Touch-specific handlers for mobile reliability ===
+    // These fire on touchstart and call preventDefault to stop the browser
+    // from consuming the touch for scrolling (especially inside scroll containers).
+
+    function handleCardTouch(e) {
+        if (!isGameActive) return;
+        e.preventDefault(); // Prevent scroll/zoom on touch
+        const clickedCard = e.currentTarget;
+
+        if (selectedCardElement === clickedCard) {
+            clearSelectedCard();
+        } else {
+            clearSelectedCard();
+            selectedCardElement = clickedCard;
+            selectedCardElement.classList.add('selected-card');
+            // Show instruction banner for mobile users
+            if (mobileInstruction) mobileInstruction.classList.remove('hidden');
+        }
+    }
+
+    function handleZoneTouch(e) {
+        if (!isGameActive || !selectedCardElement) return;
+        e.preventDefault(); // Prevent scroll/zoom on touch
+        const zone = e.currentTarget;
+        processPlacement(selectedCardElement, zone);
+        clearSelectedCard();
+    }
+
     function clearSelectedCard() {
         if (selectedCardElement) {
             selectedCardElement.classList.remove('selected-card');
             selectedCardElement = null;
         }
+        // Always hide instruction banner when selection is cleared
+        if (mobileInstruction) mobileInstruction.classList.add('hidden');
     }
 
     function processPlacement(cardEl, zone) {
