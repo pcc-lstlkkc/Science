@@ -417,14 +417,16 @@
             zone.removeEventListener('pointerdown', handleZonePointerDown);
             zone.removeEventListener('touchstart', handleZoneTouch);
 
-            // Desktop: HTML5 drag-and-drop
-            zone.addEventListener('dragover', handleDragOver);
-            zone.addEventListener('dragleave', handleDragLeave);
-            zone.addEventListener('drop', handleDrop);
-            // Both: pointer events (desktop mouse + mobile tap fallback)
-            zone.addEventListener('pointerdown', handleZonePointerDown);
-            // Mobile: touchstart for reliable touch inside scroll containers
-            zone.addEventListener('touchstart', handleZoneTouch, { passive: false });
+            // Desktop: drag-and-drop + pointer events
+            // Mobile: touchstart only (pointerdown + touchstart would conflict on tap)
+            if (window.matchMedia('(pointer: coarse)').matches) {
+                zone.addEventListener('touchstart', handleZoneTouch, { passive: false });
+            } else {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('pointerdown', handleZonePointerDown);
+            }
         });
     }
 
@@ -443,14 +445,14 @@
             cardEl.dataset.step = card.step;
             cardEl.innerText = card.name;
 
-            // Desktop: HTML5 drag start
-            if (!isTouchDevice) {
+            // Desktop: drag-and-drop + pointer events
+            // Mobile: touchstart only (pointerdown + touchstart would conflict on tap)
+            if (isTouchDevice) {
+                cardEl.addEventListener('touchstart', handleCardTouch, { passive: false });
+            } else {
                 cardEl.addEventListener('dragstart', handleDragStart);
+                cardEl.addEventListener('pointerdown', handleCardPointerDown);
             }
-            // Both: pointer events
-            cardEl.addEventListener('pointerdown', handleCardPointerDown);
-            // Mobile: touchstart for reliable touch in scroll containers
-            cardEl.addEventListener('touchstart', handleCardTouch, { passive: false });
 
             cardsPool.appendChild(cardEl);
         });
