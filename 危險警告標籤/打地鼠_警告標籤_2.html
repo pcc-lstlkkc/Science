@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
@@ -293,8 +293,8 @@
             slot.appendChild(img);
             renderNames(h.name);
 
-            // 停留時間：從 4.0 秒 (4000ms) 起步，最短不小於 1.4 秒 (1400ms)，每答對一題扣 40ms
-            const dwell = Math.max(1400, 4000 - Math.floor(correct * 40));
+            // 停留時間隨遊戲進行縮短
+            const dwell = Math.max(1400, 2200 - Math.floor(correct * 40));
             await delay(dwell);
 
             // 若此題尚未答對
@@ -520,3 +520,4 @@
     </script>
 </body>
 </html>
+
